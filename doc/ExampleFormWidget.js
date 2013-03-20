@@ -68,7 +68,7 @@ define([
               options: [
                 { value: "dev", label: "Developer" },
                 { value: "manager", label: "Manager" },
-                { value: "tester", label: "Tester" },
+                { value: "tester", label: "Tester" }
               ]
             }]
             // Here we could nest another group in this group (no limit)

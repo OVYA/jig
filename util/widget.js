@@ -106,7 +106,7 @@ var self = { //--noindent--
       parent.selectChild(widget);
     }
     return widget;
-  },
+  }
 
 };
 

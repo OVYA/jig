@@ -24,7 +24,7 @@ define([
   "dojo/dom-class",
 
   "dijit/form/DropDownButton",
-  "dijit/TooltipDialog",
+  "dijit/TooltipDialog"
 ], function(module, declare, _Widget,
             async, widget, Action, lang, window, domClass,
             DropDownButton, TooltipDialog) {
@@ -83,7 +83,7 @@ define([
           'class': 'nolabel gear',
           dropDown: new TooltipDialog({'class': 'jigActionsTooltip jigDataPaneTooltip'}),
           onMouseEnter: lang.hitch(null, domClass.add, this.domNode, 'overDD'),
-          onMouseLeave: lang.hitch(null, domClass.remove, this.domNode, 'overDD'),
+          onMouseLeave: lang.hitch(null, domClass.remove, this.domNode, 'overDD')
         }]);
 
       this.dom(
@@ -99,8 +99,8 @@ define([
         [Action, {
           label: "Supprimer",
           iconClass: 'remove',
-          onExecute: async.deferHitch(this, this.deleteObject),
-        }],
+          onExecute: async.deferHitch(this, this.deleteObject)
+        }]
       ];
     },
 

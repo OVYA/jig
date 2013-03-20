@@ -26,7 +26,7 @@ define([
   "dojo/dom-construct",
   "dojo/dom-class",
   "dojo/_base/array",
-  "dojo/_base/lang",
+  "dojo/_base/lang"
 ], function(module, require, declare, _Widget,
             widget, async,
             event, window, topic, construct, domClass, array, lang) {

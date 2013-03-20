@@ -13,7 +13,7 @@ define([
   "dijit/form/_FormMixin",
   "dojo/_base/lang",
   "dojo/aspect",
-  "../util/widget",
+  "../util/widget"
 ], function(module, declare, _FormMixin, lang, aspect, widget) {
 
 return declare(_FormMixin, { //--noindent--

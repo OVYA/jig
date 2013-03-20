@@ -8,7 +8,7 @@ define([
   "../TestModule",
   "../Asserts",
   "./SyncTestModule1",
-  "./SyncTestModule2",
+  "./SyncTestModule2"
 ], function(module, declare, TestModule, Asserts, SyncTestModule1, SyncTestModule2) {
 
 return declare(TestModule, { //--noindent--
@@ -32,7 +32,7 @@ return declare(TestModule, { //--noindent--
     /**
      * Form4: class module ID with options
      */
-    { "class": "geonef/jig/test/example/SyncTestModule4", prop1: 43 },
+    { "class": "geonef/jig/test/example/SyncTestModule4", prop1: 43 }
   ],
 
   postMixInProperties: function() {

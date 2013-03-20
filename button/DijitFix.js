@@ -5,7 +5,7 @@ define([
   "module",
   "dojo/_base/declare",
   "dojo/query",
-  "dojo/NodeList-dom",
+  "dojo/NodeList-dom"
 ], function(module, declare, query) {
 
   return declare(null, { //--noindent--

@@ -2,7 +2,7 @@ define([
   "module",
   "dojo/_base/declare",
   "dijit/form/DateTextBox",
-  "dojo/date/stamp",
+  "dojo/date/stamp"
 ], function(module, declare, DateTextBox, stamp) {
 
 /**

@@ -9,7 +9,7 @@ define([
   "./util/value",
 
   "dojox/uuid/generateRandomUuid",
-  "dojo/Deferred",
+  "dojo/Deferred"
 ], function(require, declare, lang, window, request, json, topic, value,
             generateRandomUuid, Deferred) {
 
@@ -234,7 +234,7 @@ define([
       return request.post(lang.mixin({
         url: options.url || self.url,
         handleAs: 'text',
-        postData: json.stringify(requestToSend),
+        postData: json.stringify(requestToSend)
       }, options), true)
         .then(_processResponse, _processError);
     },
@@ -276,7 +276,7 @@ define([
 
     doPing: function() {
       self.request({ module: 'user', action: 'ping' } );
-    },
+    }
 
   };
 

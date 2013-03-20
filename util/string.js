@@ -2,7 +2,7 @@
  * Utility functions dealing with strings
  */
 define([
-         "dojo/_base/lang",
+         "dojo/_base/lang"
 ], function(lang) {
 
 return { //--noindent--

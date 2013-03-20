@@ -30,7 +30,7 @@ define([
   "../../util/string",
   "../../util/array",
   "../../util/object",
-  "../../util/async",
+  "../../util/async"
 ], function(module, declare, lang, Deferred, allPromises, topic, when, whenAll,
             model, value, string, array, object, async) {
 
@@ -38,7 +38,7 @@ define([
   var goThrough = function(value) { return value; };
   var scalar = {
     fromServer: goThrough,
-    toServer: goThrough,
+    toServer: goThrough
   };
 
 return declare(null, { //--noindent--
@@ -122,7 +122,7 @@ return declare(null, { //--noindent--
    * @type {Object.<string,Object>}
    */
   properties: {
-    id: { type: 'string', readOnly: true },
+    id: { type: 'string', readOnly: true }
   },
 
   /**
@@ -418,7 +418,7 @@ return declare(null, { //--noindent--
    */
   fromServerValue: function(props, options) {
     options = object.mixOptions({
-      setOriginal: true,
+      setOriginal: true
     }, options);
 
     var _this = this;

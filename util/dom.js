@@ -37,13 +37,13 @@ define([
            return ["tr", {}, row[1] ?
                    [
                      ["td", {"class": "n"}, row[0]],
-                     ["td", {}, row[1]],
+                     ["td", {}, row[1]]
                    ] :
                    [["td", {colspan: "2"}, row[0]]]
                   ];
          })
         ]]];
-    },
+    }
 
 
   };

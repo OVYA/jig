@@ -5,7 +5,7 @@ define([
   "dojo/_base/lang",
   "dojo/dom",
   "dojo/dom-construct",
-  "dojo/dom-style",
+  "dojo/dom-style"
 ], function(module, declare, _Widget, lang, dom, construct, style) {
 
 

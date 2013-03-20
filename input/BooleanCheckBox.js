@@ -4,7 +4,7 @@ define([
   "dijit/form/CheckBox",
 
   "dojo/_base/lang",
-  "dijit/registry",
+  "dijit/registry"
 ], function(module, declare, CheckBox,
             lang, registry) {
 

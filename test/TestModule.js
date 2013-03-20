@@ -11,7 +11,7 @@ define([
   "dojo/_base/lang",
   "dojo/when",
   "dojo/Deferred",
-  "geonef/jig/util/value",
+  "geonef/jig/util/value"
 ], function(module, require, declare, lang, when, Deferred, valueUtils) {
 
 return declare(null, { //--noindent--

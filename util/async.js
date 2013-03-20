@@ -7,7 +7,7 @@ define([
   "dojo/_base/lang",
   "dojo/_base/window",
   "dojo/_base/kernel",
-  "dojo/promise/all",
+  "dojo/promise/all"
 ], function(require, Deferred, lang, window, kernel, allPromises) {
 
 
@@ -173,7 +173,7 @@ var self = { //--noindent--
     return function(arg) {
       return self.bindArg(arg, promise);
     };
-  },
+  }
 
 
 };

@@ -8,7 +8,7 @@ define([
   "../Asserts",
   "../../data/model",
   "../../data/model/Abstract",
-  "dojo/_base/lang",
+  "dojo/_base/lang"
 ], function(module, declare, TestModule, Asserts, model, AbstractModel, lang) {
 
 return declare(TestModule, { //--noindent--

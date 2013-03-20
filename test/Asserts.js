@@ -3,7 +3,7 @@
  */
 define([
   "module",
-  "dojo/_base/declare",
+  "dojo/_base/declare"
 ], function(module, declare) {
 
   "use strict";

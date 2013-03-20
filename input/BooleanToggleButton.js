@@ -1,7 +1,7 @@
 define([
   "module",
   "dojo/_base/declare",
-  "dijit/form/ToggleButton",
+  "dijit/form/ToggleButton"
 ], function(module, declare, ToggleButton) {
 
   /**

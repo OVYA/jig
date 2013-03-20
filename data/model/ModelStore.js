@@ -41,7 +41,7 @@ define([
   "dojo/topic",
   "dojo/when",
   "../../util/async",
-  "../../util/value",
+  "../../util/value"
 ], function(module, require, declare, api, lang, topic, when, async, value) {
 
 return declare(null, { //--noindent--
@@ -220,7 +220,7 @@ return declare(null, { //--noindent--
       .then(function(value) {
         return _this.apiRequest(lang.mixin({
           action: 'put',
-          object: value,
+          object: value
         }, options), {}, object);
       })
       .then(function(resp) {
@@ -278,7 +278,7 @@ return declare(null, { //--noindent--
     var _this = this;
     var obj, resp;
     return this.apiRequest(lang.mixin({
-      action: 'duplicate', id: object.id,
+      action: 'duplicate', id: object.id
     }, options), null, object)
       .then(function(_resp) {
         resp = _resp;
@@ -345,7 +345,7 @@ return declare(null, { //--noindent--
 
     return this.apiRequest(lang.mixin({
       action: 'query',
-      filters: newFilter, /* options: options || {}*/
+      filters: newFilter /* options: options || {}*/
     }, options))
       .then(lang.hitch(this, function(resp) {
         if (!resp.results) {
@@ -368,7 +368,7 @@ return declare(null, { //--noindent--
   remove: function(obj) {
     var deferred = this.apiRequest({
       action: 'delete',
-      id: obj.getId(),
+      id: obj.getId()
     }, null, obj)
       .then(function(resp) {
         obj.afterDelete();

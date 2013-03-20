@@ -60,7 +60,7 @@ define([
   "dojo/_base/lang",
   "dojo/dom-construct",
   "dijit/_Widget",
-  "dijit/Tooltip",
+  "dijit/Tooltip"
 ], function(lang, construct, _Widget, Tooltip) {
 
   function addChildTo(node, childNode) {

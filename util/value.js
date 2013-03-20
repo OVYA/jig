@@ -4,7 +4,7 @@
 define([
   "dojo/_base/lang",
   "dojo/_base/kernel",
-  "dojo/Deferred",
+  "dojo/Deferred"
   // this file uses the global AMD 'require' function
 ], function(lang, kernel, Deferred) {
 
@@ -82,7 +82,7 @@ var self = { //--noindent--
     }
 
     return value1 === value2;
-  },
+  }
 
 };
 

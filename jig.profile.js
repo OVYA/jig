@@ -5,7 +5,7 @@ var profile = (function()
   var copyOnly = function(filename, mid) {
     var list = {
       "geonef/jig/jig.profile":1,
-      "geonef/jig/package.json":1,
+      "geonef/jig/package.json":1
     };
 
     return mid in list;

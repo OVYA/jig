@@ -34,7 +34,7 @@ return declare(_Widget, { //--noindent--
       ["div", {"class": "content"}, [
         // ["img", { src: this.iconUrl + "/spinner32.gif",
         //           alt: "Loading..." }]
-      ]],
+      ]]
 
     ];
   },

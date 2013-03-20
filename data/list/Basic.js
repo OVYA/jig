@@ -24,7 +24,7 @@ define([
   "./BasicRow",
 
   "../../util/async",
-  "../../button/Action",
+  "../../button/Action"
 ], function(module, declare, _Widget, CreatorMixin,
             lang, style, domClass, string, allPromises,
             Deferred, model, BasicRow,

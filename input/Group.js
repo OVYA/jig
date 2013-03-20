@@ -5,7 +5,7 @@ define([
   "./_Container",
 
   "dojo/dom-construct",
-  "dojo/_base/event",
+  "dojo/_base/event"
 
 ], function(module, declare, _Widget, _Container,
             construct, event) {

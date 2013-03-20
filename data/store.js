@@ -20,7 +20,7 @@ define([
         var store = model.getStore(Model);
         load(store);
       });
-    },
+    }
 
   };
 

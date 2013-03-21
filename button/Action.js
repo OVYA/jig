@@ -106,7 +106,7 @@ return declare(_Widget, { //--noindent--
   /**
    * If true, onExecute() is called on a deferred loop
    */
-  deferExecute: false,
+  deferExecute: true,
 
   /**
    * If true, do not bubble up the execute() event
@@ -183,7 +183,7 @@ return declare(_Widget, { //--noindent--
     if (!this.confirm ||
         window.global.confirm(this.confirm)) {
       if (this.deferExecute) {
-        async.whenTimeout(0).then(execute);
+        async.whenTimeout(10).then(execute);
       } else {
         execute();
       }

@@ -181,17 +181,17 @@ return declare([_Widget], { //--noindent--
     if (this._destroyed) { return null; }
     this.destroyDom();
     var domNode = this.domNode;
-    var _this = this;
+
     return allPromises(this.dom(this.makeContentNodes(arg)))
-      .then(function(nodes) {
-        if (_this._destroyed) {
+      .then(lang.hitch(this, function(nodes) {
+        if (this._destroyed) {
           throw new Error("rebuildDom(): widget was destroyed in the middle :(");
         }
 
-        nodes.forEach(function(node) { if (node) { domNode.appendChild(node); } });
-        _this.afterRebuildDom();
+        nodes.forEach(function(node) {if (node) {domNode.appendChild(node);}});
+        this.afterRebuildDom();
         return nodes;
-      });
+      }));
   },
 
   /**
@@ -225,6 +225,7 @@ return declare([_Widget], { //--noindent--
    * @return {dijit/_WidgetBase} the given widget
    */
   enableSubWidget: function(widget, onDestroy) {
+    console.error("This method must be deleted !!");
     this.destroySubWidget();
     this.subHides.forEach(
       function(name) {
@@ -255,6 +256,7 @@ return declare([_Widget], { //--noindent--
    * @return {boolean} Whether the widget was not already closed
    */
   destroySubWidget: function() {
+    console.error("This method must be deleted !!");
     var widget = this.subWidget;
     if (widget) {
       delete this.subWidget;

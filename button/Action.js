@@ -69,6 +69,13 @@ return declare(_Widget, { //--noindent--
   cssClasses: '',
 
   /**
+   * Additional CSS classes to set
+   *
+   * @type {string}
+   */
+  extraClass: '',
+
+  /**
    * If set, a confirmation is asked on mouseClick before calling onExecute
    */
   confirm: '',

@@ -18,6 +18,9 @@ return declare(DateTextBox,
 
   timestamp: false,
   autoSerialize: false,
+  serializeOptions: {
+    selector: "date"
+  },
 
   _setValueAttr: function(value) {
     if (typeof value == 'string') {
@@ -34,7 +37,7 @@ return declare(DateTextBox,
   _getValueAttr: function() {
     var value = this.inherited(arguments);
     if (value && this.autoSerialize) {
-      value = this.serialize(value);
+      value = this.serialize(value, this.serializeOptions);
     }
     return value;
   },

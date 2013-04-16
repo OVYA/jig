@@ -188,7 +188,7 @@ return declare([_Widget], { //--noindent--
           throw new Error("rebuildDom(): widget was destroyed in the middle :(");
         }
 
-        nodes.forEach(function(node) {if (node) {domNode.appendChild(node);}});
+        nodes.forEach(function(node) { if (node) { domNode.appendChild(node); } });
         this.afterRebuildDom();
         return nodes;
       }));

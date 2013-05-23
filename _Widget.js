@@ -225,7 +225,7 @@ return declare([_Widget], { //--noindent--
    * @return {dijit/_WidgetBase} the given widget
    */
   enableSubWidget: function(widget, onDestroy) {
-    console.error("This method must be deleted !!");
+    // console.error("This method must be deleted !!");
     this.destroySubWidget();
     this.subHides.forEach(
       function(name) {
@@ -256,7 +256,7 @@ return declare([_Widget], { //--noindent--
    * @return {boolean} Whether the widget was not already closed
    */
   destroySubWidget: function() {
-    console.error("This method must be deleted !!");
+    // console.error("This method must be deleted !!");
     var widget = this.subWidget;
     if (widget) {
       delete this.subWidget;

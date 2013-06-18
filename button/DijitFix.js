@@ -5,19 +5,23 @@ define([
   "module",
   "dojo/_base/declare",
   "dojo/query",
-  "dojo/NodeList-dom",
+  "dojo/NodeList-dom"
 ], function(module, declare, query) {
 
   return declare(null, { //--noindent--
+
+    fixDijitButton: true,
 
     /**
      * @override
      */
     buildRendering: function() {
       this.inherited(arguments);
-      query(".dijitButtonNode", this.domNode)
-        .removeClass("dijitButtonNode")
-        .addClass("button");
+      if (this.fixDijitButton) {
+        query(".dijitButtonNode", this.domNode)
+          .removeClass("dijitButtonNode")
+          .addClass("button");
+      }
     },
 
     /**

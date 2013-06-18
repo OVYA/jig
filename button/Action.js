@@ -26,7 +26,7 @@ define([
   "dojo/dom-construct",
   "dojo/dom-class",
   "dojo/_base/array",
-  "dojo/_base/lang",
+  "dojo/_base/lang"
 ], function(module, require, declare, _Widget,
             widget, async,
             event, window, topic, construct, domClass, array, lang) {
@@ -62,7 +62,7 @@ return declare(_Widget, { //--noindent--
   "class": "button",
 
   /**
-   * Additional CSS classes to set
+   * Additional CSS classes to set (obsolete - use 'extraClass' instead)
    *
    * @type {string}
    */
@@ -106,7 +106,19 @@ return declare(_Widget, { //--noindent--
   /**
    * If true, onExecute() is called on a deferred loop
    */
-  deferExecute: false,
+  deferExecute: true,
+
+  /**
+   * If true, do not bubble up the execute() event
+   *
+   * It's a kind of "submit", for example it would automatically close
+   * a dialog or tooltip dialog.
+   *
+   * @type {boolean}
+   */
+  noSubmit: false,
+
+  connectA: true,
 
   buildRendering: function() {
     //console.log('buildRendering', this, arguments);
@@ -124,10 +136,10 @@ return declare(_Widget, { //--noindent--
     if (this.label) {
       this.domNode.innerHTML = this.label;
     }
-    domClass.add(this.domNode, this["class"]+" "+this.cssClasses);
-    // if (this.domNode.nodeName !== 'A') {
+    domClass.add(this.domNode, this["class"]+" "+this.extraClass + " " + this.cssClasses);
+    if (this.domNode.nodeName !== 'A' || this.connectA) {
       this.connect(this.domNode, 'onclick', 'onClick');
-    // }
+    }
   },
 
   _setLabelAttr: function(label) {
@@ -171,7 +183,7 @@ return declare(_Widget, { //--noindent--
     if (!this.confirm ||
         window.global.confirm(this.confirm)) {
       if (this.deferExecute) {
-        async.whenTimeout(0).then(execute);
+        async.whenTimeout(10).then(execute);
       } else {
         execute();
       }

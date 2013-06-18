@@ -3,7 +3,7 @@
  */
 define([
   "dojo/has",
-  "dojo/_base/lang",
+  "dojo/_base/lang"
 ], function(has, lang) {
 
   var h = lang.hitch;
@@ -174,7 +174,7 @@ var self = { //--noindent--
       }
     }
     return -1;
-  },
+  }
 
 };
 

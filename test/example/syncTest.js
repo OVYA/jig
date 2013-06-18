@@ -2,7 +2,7 @@
  * Example of synchronous test
  */
 define([
-  "../Asserts",
+  "../Asserts"
 ], function(Asserts) {
 
   "use strict";

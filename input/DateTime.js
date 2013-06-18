@@ -11,7 +11,7 @@ define([
 
   "./DateTextBox",
   "dijit/form/TimeTextBox",
-  "../button/Action",
+  "../button/Action"
 ], function(module, declare, _Widget, lang, domClass,
             DateTextBox, TimeTextBox, Action) {
 
@@ -40,7 +40,7 @@ return declare(_Widget, { //--noindent--
             onChange: h(this, this.onSubChange),
             tooltipPosition: ["above", "below"],
             promptMessage: this.datePromptMessage,
-            missingMessage: this.dateMissingMessage,
+            missingMessage: this.dateMissingMessage
           }]
         ]],
         ["td", {"class": "noTimeOnly"}, [
@@ -54,7 +54,7 @@ return declare(_Widget, { //--noindent--
             _attach: "timeInput",
             onChange: h(this, this.onSubChange),
             tooltipPosition: ["above", "below"],
-            promptMessage: this.timePromptMessage,
+            promptMessage: this.timePromptMessage
           }]
         ]],
         ["td", {"class": "timeOnly"}, [

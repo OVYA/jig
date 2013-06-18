@@ -1,8 +1,9 @@
 define([
+  "module",
   "dojo/_base/declare",
   "dijit/form/DateTextBox",
-  "dojo/date/stamp",
-], function(declare, DateTextBox, stamp) {
+  "dojo/date/stamp"
+], function(module, declare, DateTextBox, stamp) {
 
 /**
  * Extension of dijit/DataTextBox to deal with string date value
@@ -17,6 +18,9 @@ return declare(DateTextBox,
 
   timestamp: false,
   autoSerialize: false,
+  serializeOptions: {
+    selector: "date"
+  },
 
   _setValueAttr: function(value) {
     if (typeof value == 'string') {
@@ -24,8 +28,7 @@ return declare(DateTextBox,
       var displayValue = value;
       // var date = new Date(displayValue);
       var date = stamp.fromISOString(displayValue);
-      console.log("pajzodi jazoijd", date, displayValue);
-      this.attr('value', date);
+      this.set('value', date);
     } else {
       this.inherited(arguments);
     }
@@ -34,10 +37,12 @@ return declare(DateTextBox,
   _getValueAttr: function() {
     var value = this.inherited(arguments);
     if (value && this.autoSerialize) {
-      value = this.serialize(value);
+      value = this.serialize(value, this.serializeOptions);
     }
     return value;
-  }
+  },
+
+  declaredClass: module.id
 
 });
 

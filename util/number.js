@@ -3,7 +3,7 @@
  */
 define([
   "dojo/_base/lang",
-  "dojo/number",
+  "dojo/number"
 ], function(lang, dojoNumber) {
 
 var self = { //--noindent--

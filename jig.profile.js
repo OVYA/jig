@@ -5,7 +5,7 @@ var profile = (function()
   var copyOnly = function(filename, mid) {
     var list = {
       "geonef/jig/jig.profile":1,
-      "geonef/jig/package.json":1,
+      "geonef/jig/package.json":1
     };
 
     return mid in list;
@@ -14,7 +14,7 @@ var profile = (function()
   return {
     resourceTags:{
       test: function(filename, mid){
-        return false; // no test yet
+        return testResourceRe.test(mid);
       },
 
       copyOnly: function(filename, mid){
@@ -24,7 +24,6 @@ var profile = (function()
       amd: function(filename, mid){
 	return !testResourceRe.test(mid) &&
           !copyOnly(filename, mid) &&
-          // !usesDojoProvideEtAl(mid) &&
           /\.js$/.test(filename);
       },
 

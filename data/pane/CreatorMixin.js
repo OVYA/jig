@@ -2,7 +2,7 @@ define([
   "module",
   "dojo/_base/declare",
   "dojo/_base/lang",
-  "dojo/Deferred",
+  "dojo/Deferred"
 ], function(module, declare, lang, Deferred) {
 
 

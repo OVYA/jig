@@ -1,4 +1,5 @@
 define([
+  "module",
   "dojo/_base/declare",
   "dijit/_Widget",
   "dojo/_base/lang",
@@ -7,10 +8,11 @@ define([
   "dojo/dom-class",
   "dojo/aspect",
   "dojo/promise/all",
+  "dojo/Deferred",
 
   "./util/makeDOM",
   "./util/async"
-], function(declare, _Widget, lang, fx, style, domClass, aspect, allPromises,
+], function(module, declare, _Widget, lang, fx, style, domClass, aspect, allPromises, Deferred,
             makeDOM, async) {
 
   /**
@@ -64,6 +66,13 @@ return declare([_Widget], { //--noindent--
   delayedContent: false,
 
   /**
+   * Promise, resolved when widget DOM content is built and ready
+   *
+   * @type {dojo/Deferred}
+   */
+  whenDomReady: null,
+
+  /**
    * Names of node properties to hide when a sub-widget is open
    *
    * @type {Array.<string>} subHides
@@ -76,6 +85,7 @@ return declare([_Widget], { //--noindent--
    */
   postMixInProperties: function() {
     this.domWidgets = [];
+    this.whenDomReady = new Deferred();
     this.inherited(arguments);
   },
 
@@ -129,6 +139,9 @@ return declare([_Widget], { //--noindent--
   startup: function() {
     this.inherited(arguments);
     this.domWidgets.forEach(function(w) { if (!w._started) { w.startup(); }});
+    if (!this.delayedContent) {
+      this.whenDomReady.resolve();
+    }
   },
 
   /**
@@ -149,7 +162,7 @@ return declare([_Widget], { //--noindent--
   destroyDom: function() {
     this.destroySubWidget();
     if (this.domWidgets) {
-      this.domWidgets.forEach(function(w) { w.destroy(); });
+      this.domWidgets/*.slice(0)*/.forEach(function(w) { w.destroy(); });
       this.domWidgets = [];
     }
     if (this.domNode) {
@@ -168,23 +181,26 @@ return declare([_Widget], { //--noindent--
     if (this._destroyed) { return null; }
     this.destroyDom();
     var domNode = this.domNode;
-    var _this = this;
+
     return allPromises(this.dom(this.makeContentNodes(arg)))
-      .then(function(nodes) {
-        if (_this._destroyed) {
+      .then(lang.hitch(this, function(nodes) {
+        if (this._destroyed) {
           throw new Error("rebuildDom(): widget was destroyed in the middle :(");
         }
 
-        nodes.forEach(function(node) { domNode.appendChild(node); });
-        _this.afterRebuildDom();
+        nodes.forEach(function(node) { if (node) { domNode.appendChild(node); } });
+        this.afterRebuildDom();
         return nodes;
-      });
+      }));
   },
 
   /**
    * Hook
    */
   afterRebuildDom: function() {
+    if (!(this.whenDomReady.fired >= 0)) {
+      this.whenDomReady.resolve();
+    }
     this.onResize();
   },
 
@@ -209,6 +225,7 @@ return declare([_Widget], { //--noindent--
    * @return {dijit/_WidgetBase} the given widget
    */
   enableSubWidget: function(widget, onDestroy) {
+    // console.error("This method must be deleted !!");
     this.destroySubWidget();
     this.subHides.forEach(
       function(name) {
@@ -217,8 +234,9 @@ return declare([_Widget], { //--noindent--
           style.set(node.domNode || node, 'display', 'none');
         }
       }, this);
-    widget.placeAt(this.opNode).startup();
+    widget.placeAt(this.opNode || this.domNode).startup();
     this.subWidget = widget;
+    domClass.add(widget.domNode, 'sub');
     domClass.add(this.domNode, 'hasSub');
     var _this = this;
     aspect.before(widget, 'uninitialize',// 'destroy',
@@ -238,6 +256,7 @@ return declare([_Widget], { //--noindent--
    * @return {boolean} Whether the widget was not already closed
    */
   destroySubWidget: function() {
+    // console.error("This method must be deleted !!");
     var widget = this.subWidget;
     if (widget) {
       delete this.subWidget;
@@ -260,17 +279,7 @@ return declare([_Widget], { //--noindent--
     return false;
   },
 
-  fadeIn:function(options){
-    fx.fadeIn(lang.mixin({
-      node: this.domNode
-    }, options || {})).play();
-  },
-
-  fadeOut:function(options){
-    fx.fadeOut(lang.mixin({
-      node: this.domNode
-    }, options || {})).play();
-  }
+  declaredClass: module.id
 
 });
 

@@ -60,8 +60,17 @@ define([
   "dojo/_base/lang",
   "dojo/dom-construct",
   "dijit/_Widget",
-  "dijit/Tooltip",
+  "dijit/Tooltip"
 ], function(lang, construct, _Widget, Tooltip) {
+
+  //Returns true if it is a DOM element
+  function isElement(o){
+    return (
+      typeof HTMLElement === "object" ? o instanceof HTMLElement : //DOM2
+      o && typeof o === "object" && o.nodeType === 1 && typeof o.nodeName==="string"
+    );
+  }
+
 
   function addChildTo(node, childNode) {
 
@@ -91,31 +100,32 @@ define([
 
     if (children) {
       var child = children;
-        if (child instanceof Array) {
-          if (typeof child[0] == 'string' || typeof child[0] == 'function') {
-            // child is an args array for makeDOM
-            var childNode = self(child, obj);
-            addChild(childNode);
-          } else {
-            // assume child is an array of args
-            child.map(function(c) { return self(c, obj); })
-              .forEach(addChild);
-          }
-        } else if (child instanceof HTMLElement || child.then) {
-          addChild(child);
+      if (child instanceof Array) {
+        if (typeof child[0] == 'string' || typeof child[0] == 'function') {
+          // child is an args array for makeDOM
+          var childNode = self(child, obj);
+          addChild(childNode);
         } else {
-          // scalar content value - set as text
-          node.innerHTML = child;
+          // assume child is an array of args
+          child.map(function(c) { return self(c, obj); })
+            .forEach(addChild);
         }
+      } else if (isElement(child) || typeof child === "HTMLElement" || child.then) {
+        addChild(child);
+      } else {
+        // scalar content value - set as text
+        node.innerHTML = child;
+      }
     }
   }
+
 
   function self(args, obj) {
     // console.log('makeDOM args=', args);
     var node;
 
     if (!args) { return null; }
-    if (args instanceof HTMLElement) {
+    if (isElement(args) || typeof args === "HTMLElement" || args.domNode) {
       return args;
     }
     if (args.then) {

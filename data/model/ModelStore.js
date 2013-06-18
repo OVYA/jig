@@ -41,7 +41,7 @@ define([
   "dojo/topic",
   "dojo/when",
   "../../util/async",
-  "../../util/value",
+  "../../util/value"
 ], function(module, require, declare, api, lang, topic, when, async, value) {
 
 return declare(null, { //--noindent--
@@ -140,7 +140,7 @@ return declare(null, { //--noindent--
   get: function(id, options) {
     var obj = this.index[id];
     if (obj && (!options || (!options.fields && !options.fieldGroup))) {
-      return async.newResolved(obj);
+      return async.bindArg(obj);
     } else {
       var _this = this;
       return this.apiRequest(lang.mixin({ action: 'get', id: id }, options),
@@ -220,7 +220,7 @@ return declare(null, { //--noindent--
       .then(function(value) {
         return _this.apiRequest(lang.mixin({
           action: 'put',
-          object: value,
+          object: value
         }, options), {}, object);
       })
       .then(function(resp) {
@@ -278,7 +278,7 @@ return declare(null, { //--noindent--
     var _this = this;
     var obj, resp;
     return this.apiRequest(lang.mixin({
-      action: 'duplicate', id: object.id,
+      action: 'duplicate', id: object.id
     }, options), null, object)
       .then(function(_resp) {
         resp = _resp;
@@ -320,32 +320,32 @@ return declare(null, { //--noindent--
    * @return {dojo/Deferred} callback whose arg is the model object
    */
   query: function(filter, options) {
-    // console.log('filter', this, arguments);
     var implied = {};
+    var newFilter = {};;
     var prop, tmpFilter;
 
     var Abstract = require('./Abstract');
     // fix filter and make up implied value from it
     if (filter) {
       for (prop in filter) if (filter.hasOwnProperty(prop)) {
-        tmpFilter = filter[prop];
+
+        tmpFilter = newFilter[prop] = filter[prop];
         if (tmpFilter instanceof Abstract) {
-          tmpFilter = filter[prop] = { op: 'ref', value: tmpFilter };
+          tmpFilter = newFilter[prop] = { op: 'ref', value: tmpFilter.id };
         } else if (typeof tmpFilter == 'string' || !isNaN(tmpFilter)) {
-          tmpFilter = filter[prop] = { op: 'equals', value: tmpFilter };
+          tmpFilter = newFilter[prop] = { op: 'equals', value: tmpFilter };
         }
-        if (['equals', 'ref'].indexOf(tmpFilter.op) !== -1) {
+        if (tmpFilter.op === "equals") {
           implied[prop] = tmpFilter.value;
-        }
-        if (tmpFilter.value instanceof Abstract) {
-          tmpFilter.value = tmpFilter.value.getId();
+        } else if (tmpFilter.op === "ref") {
+          implied[prop] = { id: tmpFilter.value };
         }
       }
     }
 
     return this.apiRequest(lang.mixin({
       action: 'query',
-      filters: filter, /* options: options || {}*/
+      filters: newFilter /* options: options || {}*/
     }, options))
       .then(lang.hitch(this, function(resp) {
         if (!resp.results) {
@@ -366,12 +366,14 @@ return declare(null, { //--noindent--
    * @return {dojo/Deferred} callback with no arg
    */
   remove: function(obj) {
-    var deferred = this.apiRequest(
-      { action: 'delete',
-        id: obj.getId(),
-      }, null, obj).then(function(resp) {
+    var deferred = this.apiRequest({
+      action: 'delete',
+      id: obj.getId()
+    }, null, obj)
+      .then(function(resp) {
         obj.afterDelete();
       });
+
     obj.publish(['delete']);
     return deferred;
   },
@@ -394,7 +396,8 @@ return declare(null, { //--noindent--
       var discrValue = dataForDiscriminator[discrProp];
       var _class = Model.prototype.discriminatorMap[discrValue];
       if (!discrValue || !_class) {
-        console.error("happening on store", this, ", model ", this.Model.prototype);
+        console.error("happening on store", this, ", model ", this.Model.prototype,
+                      "makeObject(): invalid discriminator '"+discrProp+"': "+discrValue);
         throw new Error("makeObject(): invalid discriminator '"+
                         discrProp+"': "+discrValue);
       }
@@ -467,7 +470,7 @@ return declare(null, { //--noindent--
 
 
   /**
-   * Specialisation of geoenf.jig.api.request, for this class
+   * Specialisation of geonef/jig/api.request, for this class
    */
   apiRequest: function(params, options, object) {
     var module = object ? object.apiModule : this.apiModule;

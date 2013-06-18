@@ -3,7 +3,7 @@
  *
  */
 define([
-  "require",
+  "module", "require",
   "dojo/_base/declare",
   "geonef/jig/_Widget",
   "dojo/_base/window",
@@ -11,7 +11,7 @@ define([
   "dojo/_base/fx",
   "dojo/fx/easing",
   "../util/async"
-], function(require, declare, _Widget, window, style, fx, easing, async) {
+], function(module, require, declare, _Widget, window, style, fx, easing, async) {
 
 return declare(_Widget, { //--noindent--
 
@@ -32,9 +32,9 @@ return declare(_Widget, { //--noindent--
     return [
       ["div", {"class": "bg"}, "&nbsp;"],
       ["div", {"class": "content"}, [
-        ["img", { src: this.iconUrl + "/spinner32.gif",
-                  alt: "Loading..." }]
-      ]],
+        // ["img", { src: this.iconUrl + "/spinner32.gif",
+        //           alt: "Loading..." }]
+      ]]
 
     ];
   },
@@ -42,6 +42,10 @@ return declare(_Widget, { //--noindent--
   postCreate: function() {
     this.inherited(arguments);
     if (this.processingNode && !this.domNode.parentNode) {
+      // console.log("style.get(this.processingNode, 'position')", );
+      if (style.get(this.processingNode, 'position') === 'static') {
+        style.set(this.processingNode, 'position', 'relative');
+      }
       this.placeFx(this.processingNode);
     }
   },
@@ -93,7 +97,9 @@ return declare(_Widget, { //--noindent--
           }
         }
       }).play();
-  }
+  },
+
+  declaredClass: module.id
 
 });
 

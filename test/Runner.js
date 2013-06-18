@@ -11,7 +11,7 @@ define([
   "dojo/_base/declare",
   "dojo/_base/lang",
   "dojo/when",
-  "dojo/Deferred",
+  "dojo/Deferred"
 ], function(module, require, declare, lang, when, Deferred) {
 
   "use strict";

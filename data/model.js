@@ -65,7 +65,7 @@ var self = { //--noindent--
       }
     }
     return props;
-  },
+  }
 
   // /**
   //  * Flatten value recursively

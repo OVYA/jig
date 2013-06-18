@@ -7,7 +7,7 @@ define([
   "dojo/_base/lang",
   "dojo/_base/window",
   "dojo/_base/kernel",
-  "dojo/promise/all",
+  "dojo/promise/all"
 ], function(require, Deferred, lang, window, kernel, allPromises) {
 
 
@@ -48,6 +48,11 @@ var self = { //--noindent--
     return promise.then(function() { return arg; });
   },
 
+  newRejected: function(error) {
+    var promise = new Deferred();
+    promise.reject(error);
+    return promise;
+  },
 
   /**
    * Multiplex multiple deferreds
@@ -72,16 +77,6 @@ var self = { //--noindent--
     window.global.setTimeout(function() { def.resolve(); }, delay);
 
     return def;
-  },
-
-  /**
-   * Wrap call into timeout function
-   */
-  deferHitch: function(scope, func) {
-    var _func = lang.hitch.apply(null, arguments);
-    return function() {
-      self.whenTimeout(0).then(_func);
-    };
   },
 
   /**
@@ -126,11 +121,19 @@ var self = { //--noindent--
    * @return {function} must be called to stop the busy effect
    */
   busy: function(node) {
-    var Processing = require("geonef/jig/tool/Processing");
-    var control = new Processing({ processingNode: node });
-    control.startup();
+    var control;
+    require(["../tool/Processing"], function(Processing) {
+      if (control !== null) { // if terminate callback was called before we are
+        control = new Processing({ processingNode: node });
+        control.startup();
+      }
+    });
     return function(arg) {
-      control.end();
+      if (control) {
+        control.end();
+      } else {
+        control = null;
+      }
       return arg;
     };
   },
@@ -148,6 +151,30 @@ var self = { //--noindent--
       return arg;
     };
   },
+
+  /**
+   * Wrap call into timeout function
+   */
+  deferHitch: function(scope, func) {
+    var _func = lang.hitch.apply(null, arguments);
+    return function() {
+      self.whenTimeout(0).then(_func);
+    };
+  },
+
+  /**
+   * Return a function that will return a promise resolved when
+   * the given promise is resolved.
+   *
+   * The promise will be resolved with the argument provided
+   * to the function.
+   */
+  deferWhen: function(promise) {
+    return function(arg) {
+      return self.bindArg(arg, promise);
+    };
+  }
+
 
 };
 

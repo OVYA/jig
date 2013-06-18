@@ -3,20 +3,19 @@
  */
 define([
   "dojo/_base/lang",
+  "dojo/_base/kernel",
   "dojo/aspect",
   "dojo/on",
   "dijit/_Contained",
   "dijit/registry"
-], function(lang, aspect, on, _Contained, registry) {
+], function(lang, kernel, aspect, on, _Contained, registry) {
 
 var self = { //--noindent--
 
-  //  Unused
-  //
-  // getParent: function(w) {
-  //   return w.getParent ? w.getParent() :
-  //      dijit/_Contained/prototype/getParent/call(w);
-  // },
+  getParent: function(w) {
+    return w.getParent ? w.getParent() :
+      _Contained.prototype.getParent.call(w);
+  },
 
   /**
    * Return an array of widgets below 'node' which have a 'name' property
@@ -73,6 +72,8 @@ var self = { //--noindent--
    * @return {Object} Handler for use with dojo/disconnect.
    */
   connectOnce: function(obj, event, context, method) {
+    kernel.deprecated("geonef/jig/util/widget.connectOnce()",
+                      "use aspect.after() directly");
     var _h;
     var callback = lang.hitch(context, function() {
       _h.remove();
@@ -101,11 +102,11 @@ var self = { //--noindent--
    */
   focus: function(widget) {
     var parent = registry.getEnclosingWidget(widget.domNode.parentNode);
-    if (parent.selectChild) {
+    if (parent && parent.selectChild) {
       parent.selectChild(widget);
     }
     return widget;
-  },
+  }
 
 };
 

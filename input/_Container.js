@@ -232,7 +232,8 @@ return declare(_FormMixin, { //--noindent--
    * @override
    */
   _getValueAttr: function() {
-    var descendants = this.getChildren();//this.getDescendants(); getDescendants is deprecated
+    var descendants = // this.getChildren();
+    this.getDescendants(); //getDescendants is deprecated
     var value;
     if (this.booleanUnion) {
       value = descendants.filter(function(w) { return !!w.get('value'); }).

@@ -235,14 +235,11 @@ return declare(_FormMixin, { //--noindent--
     var descendants = this.getDescendants();
     var value;
     if (this.booleanUnion) {
-      value = descendants.filter(function(w) { return !!w.get('value'); }).
-        map(function(w) { return w.get('name'); });
+      value = descendants.filter(function(w) {
+        return !!w.get('value');
+      }).map(function(w) {return w.get('name');});
     } else if (this.arrayContainer) {
       value = descendants.map(function(w) { return w.get('value'); });
-      /*value = [];
-        for (var i = 0; i < descendants.length; i++) {
-        value.push(descendants[i].attr('value'));
-        }*/
     } else {
       var self = this;
       value = lang.mixin({}, this.internalValues);

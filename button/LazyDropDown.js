@@ -96,14 +96,16 @@ return declare([DropDownButton, DijitFix], { //--noindent--
    */
   loadDropDown: function(loadCallback) {
     var _this = this;
+
     this.createDropDownTooltip().then(function(dropDown) {
       _this.dropDown = dropDown;
-      if (_this.subWidget) {
-        loadCallback();
-        // _this.subWidget.startup();
-        _this.whenDDLoaded.resolve(_this.subWidget);
-      }
-    });
+        _this.dropDown.defer(function() {
+          if (_this.subWidget) {
+            loadCallback();
+            _this.whenDDLoaded.resolve(_this.subWidget);
+          }
+        }, 500);
+      });
   },
 
   /**
@@ -119,11 +121,13 @@ return declare([DropDownButton, DijitFix], { //--noindent--
     return this.widgetCreateFunc().then(function(subWidget) {
       _this.subWidget = subWidget;
       _this._isJigLoaded = !!_this.subWidget;
-      if (_this.subWidget) {
+      if (subWidget) {
         _this.subWidget._floatAnchor = true;
+        // dd.set('content', _this.subWidget.domNode); // Prefered ??
         construct.place(_this.subWidget.domNode, dd.containerNode); // no addChild!
         _this.connect(_this.subWidget, 'onResize', 'onDropDownResize');
       }
+
       return dd;
     });
   },
@@ -139,6 +143,7 @@ return declare([DropDownButton, DijitFix], { //--noindent--
       var widget = new _Class(lang.mixin({}, _this.ddOptions));
       widget._floatAnchor = true;
       style.set(widget.domNode, _this.ddStyle);
+
       return widget;
     });
   },

@@ -99,12 +99,12 @@ return declare([DropDownButton, DijitFix], { //--noindent--
 
     this.createDropDownTooltip().then(function(dropDown) {
       _this.dropDown = dropDown;
-        _this.dropDown.defer(function() {
-          if (_this.subWidget) {
-            loadCallback();
-            _this.whenDDLoaded.resolve(_this.subWidget);
-          }
-        }, 500);
+      // _this.dropDown.defer(function() {
+      if (_this.subWidget) {
+        loadCallback();
+        _this.whenDDLoaded.resolve(_this.subWidget);
+      }
+      // }, 500);
       });
   },
 

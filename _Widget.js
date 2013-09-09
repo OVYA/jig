@@ -14,7 +14,6 @@ define([
   "./util/async"
 ], function(module, declare, _Widget, lang, fx, style, domClass, aspect, allPromises, Deferred,
             makeDOM, async) {
-
   /**
    * Base class widget class
    *

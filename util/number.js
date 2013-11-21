@@ -21,10 +21,16 @@ var self = { //--noindent--
    */
   format: function(value, options) {
     if (options && options.digits) {
-      var nb = Math.ceil(Math.log(value) / Math.LN10);
-      var factor = nb < options.digits ? Math.pow(10, options.digits - nb) : 1;
+      var factor = 1;
+
+      if (value !== 0) {
+        var nb = Math.ceil(Math.log(value) / Math.LN10);
+        factor = nb < options.digits ? Math.pow(10, options.digits - nb) : 1;
+      }
+
       value = Math.round(value * factor) / factor;
     }
+
     return dojoNumber.format(value, options);
   },
 

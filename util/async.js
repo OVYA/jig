@@ -120,11 +120,15 @@ var self = { //--noindent--
    * @param {DOMElement} node
    * @return {function} must be called to stop the busy effect
    */
-  busy: function(node) {
+  busy: function(node, spinnerSize) {
     var control;
     require(["../tool/Processing"], function(Processing) {
       if (control !== null) { // if terminate callback was called before we are
-        control = new Processing({ processingNode: node });
+        var processingParams = { processingNode: node };
+        if (spinnerSize !== undefined) {
+          processingParams.spinnerSize = spinnerSize;
+        }
+        control = new Processing(processingParams);
         control.startup();
       }
     });

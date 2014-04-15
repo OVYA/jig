@@ -25,13 +25,15 @@ return declare(_Widget, { //--noindent--
 
   iconUrl: require.toUrl('geonef/jig/style/icon'),
 
+  spinnerSize: 32,
+
   "class": _Widget.prototype["class"] + " jigWidgetProcessing",
 
 
   makeContentNodes: function() {
     return [
       ["div", {"class": "bg"}, "&nbsp;"],
-      ["div", {"class": "content"}, [
+      ["div", {"class": "content spinner"+ this.spinnerSize}, [
         // ["img", { src: this.iconUrl + "/spinner32.gif",
         //           alt: "Loading..." }]
       ]]

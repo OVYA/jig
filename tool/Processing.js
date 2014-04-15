@@ -45,7 +45,9 @@ return declare(_Widget, { //--noindent--
     this.inherited(arguments);
     if (this.processingNode && !this.domNode.parentNode) {
       // console.log("style.get(this.processingNode, 'position')", );
+      this._processingNodeStatic = false;
       if (style.get(this.processingNode, 'position') === 'static') {
+        this._processingNodeStatic = true;
         style.set(this.processingNode, 'position', 'relative');
       }
       this.placeFx(this.processingNode);
@@ -99,6 +101,9 @@ return declare(_Widget, { //--noindent--
           }
         }
       }).play();
+    if (this._processingNodeStatic) {
+      style.set(this.processingNode, 'position', 'static');
+    }
   },
 
   declaredClass: module.id

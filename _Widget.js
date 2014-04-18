@@ -98,7 +98,13 @@ return declare([_Widget], { //--noindent--
         attrs.style = this.srcNodeRef.getAttribute('style');
       }
       var nodes = this.delayedContent ? [] : this.makeContentNodes();
-      this.domNode = this.dom([this.nodeName, attrs, nodes]);
+      if (this.nodeName !== null) {
+        this.domNode = this.dom([this.nodeName, attrs, nodes]);
+      } else {
+        this.domNode = this.dom(nodes);
+      }
+
+
     }
     this.inherited(arguments);
   },

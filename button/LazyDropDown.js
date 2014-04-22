@@ -21,6 +21,8 @@ define([
 
 return declare([DropDownButton, DijitFix], { //--noindent--
 
+  tooltipDialogClass: "", // css class to pass to the tooltipDialogClass
+
   /**
    * @override
    */
@@ -115,6 +117,7 @@ return declare([DropDownButton, DijitFix], { //--noindent--
    */
   createDropDownTooltip: function() {
     var dd = new TooltipDialog({
+      "class": this.tooltipDialogClass,
       removeChild: lang.hitch(this, 'removeSubWidget')
     });
     var _this = this;

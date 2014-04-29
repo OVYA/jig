@@ -146,7 +146,7 @@ return declare(_FormMixin, { //--noindent--
    */
   focus: function() {
     var widgets = this.getDescendants();
-    return widgets[0].focus();
+    return (!!widgets[0] && !!widgets[0].focus) ? widgets[0].focus() : null;
   },
 
   /**

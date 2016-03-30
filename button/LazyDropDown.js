@@ -150,6 +150,9 @@ define([
         var widget = new _Class(lang.mixin({}, _this.ddOptions));
         widget._floatAnchor = true;
         style.set(widget.domNode, _this.ddStyle);
+        if (!widget._started) {
+          widget.startup();
+        }
         if (!!widget.whenDomReady) {
           widget.whenDomReady.then(function () {
             def.resolve(widget);

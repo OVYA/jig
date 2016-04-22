@@ -1,5 +1,4 @@
-README
-======
+# README
 
 What is geonef/jig ?
 --------------------

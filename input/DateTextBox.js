@@ -23,7 +23,7 @@ define([
 
     _setValueAttr: function (value) {
 
-      if (typeof value === 'string') {
+      if (typeof value == 'string') {
         var displayValue = value;
         var date = stamp.fromISOString(displayValue);
         this.set('value', date);
@@ -31,6 +31,7 @@ define([
 
       } else {
         this.inherited(arguments);
+        this.set('dropDownDefaultValue', value);
       }
     },
 

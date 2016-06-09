@@ -59,18 +59,18 @@
 define([
   "dojo/_base/lang",
   "dojo/dom-construct",
+  "dojo/dom-attr",
   "dijit/_Widget",
   "dijit/Tooltip"
-], function(lang, construct, _Widget, Tooltip) {
+], function (lang, construct, domAttr, _Widget, Tooltip) {
 
   //Returns true if it is a DOM element
-  function isElement(o){
+  function isElement(o) {
     return (
       typeof HTMLElement === "object" ? o instanceof HTMLElement : //DOM2
-      o && typeof o === "object" && o.nodeType === 1 && typeof o.nodeName==="string"
+      o && typeof o === "object" && o.nodeType === 1 && typeof o.nodeName === "string"
     );
   }
-
 
   function addChildTo(node, childNode) {
 
@@ -79,7 +79,7 @@ define([
     }
 
     var _do =
-      function(childNode) {
+      function (childNode) {
         if (childNode) {
           node.appendChild(childNode);
         }
@@ -97,7 +97,6 @@ define([
 
     var addChild = lang.hitch(null, addChildTo, node);
 
-
     if (children) {
       var child = children;
       if (child instanceof Array) {
@@ -107,7 +106,9 @@ define([
           addChild(childNode);
         } else {
           // assume child is an array of args
-          child.map(function(c) { return self(c, obj); })
+          child.map(function (c) {
+              return self(c, obj);
+            })
             .forEach(addChild);
         }
       } else if (isElement(child) || typeof child === "HTMLElement" || child.then) {
@@ -119,17 +120,20 @@ define([
     }
   }
 
-
   function self(args, obj) {
     // console.log('makeDOM args=', args);
     var node;
 
-    if (!args) { return null; }
+    if (!args) {
+      return null;
+    }
     if (isElement(args) || typeof args === "HTMLElement" || args.domNode) {
       return args;
     }
     if (args.then) {
-      return args.then(function(def) { return self(def, obj); });
+      return args.then(function (def) {
+        return self(def, obj);
+      });
     }
     if (!args[0]) {
       console.error("obj is: ", obj, " and args are: ", args);
@@ -142,7 +146,9 @@ define([
     if (args[0] && ['string', 'function'].indexOf(typeof args[0]) === -1) {
       // if args[0] is neither of string, function or falsy: assume node-array mode
       // todo: manage async
-      return args.map(function(def) { return self(def, obj); });
+      return args.map(function (def) {
+        return self(def, obj);
+      });
     }
     // if (args[0] instanceof Array || args[0].then) {
     //   return args.map(function(def) { return self(def, obj); });
@@ -156,19 +162,24 @@ define([
     var attrs = lang.mixin({}, args[1]);
     var magic = {};
     ['_attach', '_insert', '_tooltip', '_tooltipOptions',
-     '_srcNodeName', '_if', '_ifNot'].forEach(
-       function(attr) {
-         if (attrs[attr] !== undefined) {
-           magic[attr] = attrs[attr];
-           delete attrs[attr];
-         }
-       });
+      '_srcNodeName', '_if', '_ifNot', '_NS'
+    ].forEach(
+      function (attr) {
+        if (attrs[attr] !== undefined) {
+          magic[attr] = attrs[attr];
+          delete attrs[attr];
+        }
+      });
     if (magic._if !== undefined) {
-      if (!magic._if) { return null; }
+      if (!magic._if) {
+        return null;
+      }
       if (magic._if.then) {
         return magic._if.then(
-          function(ret) {
-            if (!ret) { return null; }
+          function (ret) {
+            if (!ret) {
+              return null;
+            }
 
             var _args = args.slice(0);
             _args[1] = lang.mixin({}, _args[1]);
@@ -181,8 +192,10 @@ define([
     if (magic._ifNot) {
       if (magic._ifNot.then) {
         return magic._ifNot.then(
-          function(ret) {
-            if (ret) { return null; }
+          function (ret) {
+            if (ret) {
+              return null;
+            }
 
             var _args = args.slice(0);
             _args[1] = lang.mixin({}, _args[1]);
@@ -220,7 +233,15 @@ define([
       console.error("obj is: ", obj, " and args are: ", args);
       throw new Error("makeDOM: args[0] is null: undeclared widget class?");
     } else { // assume string - node name of DOMElement to create
-      node = construct.create(args[0], attrs);
+      if (magic._NS) {
+        node = document.createElementNS(magic._NS, args[0], attrs);
+        if (attrs) {
+          domAttr.set(node, attrs);
+        }
+      } else {
+        node = construct.create(args[0], attrs);
+      }
+
       addChildren(args[2], node, obj);
       if (obj) {
         // if (obj.domWidgets) {
@@ -236,9 +257,12 @@ define([
     }
     if (magic._tooltip) {
       var tooltip = new Tooltip(
-        lang.mixin({ label: magic._tooltip, connectId: [node],
-                     showDelay: 200, position: ['below', 'above']
-                   }, magic._tooltipOptions));
+        lang.mixin({
+          label: magic._tooltip,
+          connectId: [node],
+          showDelay: 200,
+          position: ['below', 'above']
+        }, magic._tooltipOptions));
       if (obj && obj.domWidgets) {
         obj.domWidgets.push(tooltip);
       }
@@ -251,4 +275,3 @@ define([
 
   return self;
 });
-

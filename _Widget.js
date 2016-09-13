@@ -79,6 +79,12 @@ define([
      */
     subHides: [],
 
+    // onParentDomReady function is called when all the dom is built
+    onParentDomReady: null,
+    callParentDomReadyEvtInPostCreate: true,
+
+    // ~ Widget functions ----------------------------------------------------------------------------------------------
+
     /**
      * @override
      */
@@ -111,22 +117,6 @@ define([
     },
 
     /**
-     * Copy children nodes from this.srcNodeRef to this.containerNode
-     *
-     * this.containerNode has to be defined
-     */
-    copySrcNodeChildren: function () {
-      var source = this.srcNodeRef;
-      var dest = this.containerNode;
-
-      if (source && dest) {
-        while (source.hasChildNodes()) {
-          dest.appendChild(source.firstChild);
-        }
-      }
-    },
-
-    /**
      * Overriden by child class to define DOM content
      *
      * @return {Array}    An array of arrays (see geonef/jig/util/makeDOM).
@@ -136,6 +126,15 @@ define([
      */
     makeContentNodes: function () {
       return this.contentNodes;
+    },
+
+
+    postCreate: function() {
+      this.inherited(arguments);
+
+      if (this.callParentDomReadyEvtInPostCreate && this.onParentDomReady) {
+        this.onParentDomReady();
+      }
     },
 
     /**
@@ -180,6 +179,24 @@ define([
       }
       if (this.domNode) {
         this.domNode.innerHTML = '';
+      }
+    },
+
+    // ~ utils functions -----------------------------------------------------------------------------------------------
+
+    /**
+     * Copy children nodes from this.srcNodeRef to this.containerNode
+     *
+     * this.containerNode has to be defined
+     */
+    copySrcNodeChildren: function () {
+      var source = this.srcNodeRef;
+      var dest = this.containerNode;
+
+      if (source && dest) {
+        while (source.hasChildNodes()) {
+          dest.appendChild(source.firstChild);
+        }
       }
     },
 

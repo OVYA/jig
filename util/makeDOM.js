@@ -100,7 +100,7 @@ define([
     if (children) {
       var child = children;
       if (child instanceof Array) {
-        if (typeof child[0] == 'string' || typeof child[0] == 'function') {
+        if (typeof child[0] === 'string' || typeof child[0] === 'function') {
           // child is an args array for makeDOM
           var childNode = self(child, obj);
           addChild(childNode);
@@ -121,7 +121,6 @@ define([
   }
 
   function self(args, obj) {
-    // console.log('makeDOM args=', args);
     var node;
 
     if (!args) {
@@ -150,15 +149,7 @@ define([
         return self(def, obj);
       });
     }
-    // if (args[0] instanceof Array || args[0].then) {
-    //   return args.map(function(def) { return self(def, obj); });
-    // }
-    // if (args[0] instanceof _Widget) {
-    //   return args[0].domNode;
-    // }
-    // if (args[0] instanceof HTMLElement) {
-    //     return args[0];
-    // }
+
     var attrs = lang.mixin({}, args[1]);
     var magic = {};
     ['_attach', '_insert', '_tooltip', '_tooltipOptions',
@@ -227,7 +218,7 @@ define([
       if (obj && obj._started) {
         widget.startup();
       }
-      // console.log('made widget', widget, node);
+
       node = widget.domNode;
     } else if (!args[0]) {
       console.error("obj is: ", obj, " and args are: ", args);
@@ -244,9 +235,6 @@ define([
 
       addChildren(args[2], node, obj);
       if (obj) {
-        // if (obj.domWidgets) {
-        //   obj.domWidgets.push()
-        // }
         if (magic._attach) {
           obj[magic._attach] = node;
         }
@@ -267,8 +255,6 @@ define([
         obj.domWidgets.push(tooltip);
       }
     }
-
-    // console.log('makeDOM', args, 'returning', node);
 
     return node;
   }

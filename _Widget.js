@@ -79,10 +79,6 @@ define([
      */
     subHides: [],
 
-    // onParentDomReady function is called when all the dom is built
-    onParentDomReady: null,
-    callParentDomReadyEvtInPostCreate: true,
-
     // ~ Widget functions ----------------------------------------------------------------------------------------------
 
     /**
@@ -126,15 +122,6 @@ define([
      */
     makeContentNodes: function () {
       return this.contentNodes;
-    },
-
-
-    postCreate: function() {
-      this.inherited(arguments);
-
-      if (this.callParentDomReadyEvtInPostCreate && this.onParentDomReady) {
-        this.onParentDomReady();
-      }
     },
 
     /**

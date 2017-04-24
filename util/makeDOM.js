@@ -126,9 +126,11 @@ define([
     if (!args) {
       return null;
     }
+
     if (isElement(args) || typeof args === "HTMLElement" || args.domNode) {
       return args;
     }
+
     if (args.then) {
       return args.then(function (def) {
         return self(def, obj);
@@ -161,6 +163,7 @@ define([
           delete attrs[attr];
         }
       });
+
     if (magic._if !== undefined) {
       if (!magic._if) {
         return null;
@@ -180,6 +183,7 @@ define([
           });
       }
     }
+
     if (magic._ifNot) {
       if (magic._ifNot.then) {
         return magic._ifNot.then(
@@ -197,7 +201,8 @@ define([
       }
       return null;
     }
-    if (typeof args[0] == 'function') { // assume widget class
+
+    if (typeof args[0] === 'function') { // assume widget class
       var _Class = args[0];
       var srcNode = null;
       if (magic._srcNodeName) {
@@ -240,9 +245,11 @@ define([
         }
       }
     }
+
     if (magic._insert) {
       magic._insert.appendChild(node);
     }
+
     if (magic._tooltip) {
       var tooltip = new Tooltip(
         lang.mixin({
@@ -251,6 +258,7 @@ define([
           showDelay: 200,
           position: ['below', 'above']
         }, magic._tooltipOptions));
+
       if (obj && obj.domWidgets) {
         obj.domWidgets.push(tooltip);
       }

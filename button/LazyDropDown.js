@@ -68,6 +68,9 @@ define([
      */
     whenDDLoaded: null,
 
+    /**
+     * Reload the subwidget after each click on the lazydropdown
+     */
     reloadSubWidget: null,
 
     /**

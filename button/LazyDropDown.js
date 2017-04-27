@@ -6,21 +6,34 @@
 define([
   "module",
   "dojo/_base/declare",
+  "dojo/topic",
+  "dojo/dom-construct",
+  "dojo/dom-style",
+  "dojo/Deferred",
+  "dojo/_base/lang",
+
   "dijit/form/DropDownButton",
   "./DijitFix",
   "dijit/TooltipDialog",
   "dijit/popup",
-  "dojo/_base/lang",
-  "dojo/dom-construct",
-  "dojo/dom-style",
-  "dojo/Deferred",
+
   "../util/value"
-], function (module, declare, DropDownButton, DijitFix, TooltipDialog, popup, lang,
-  construct, style, Deferred, value) {
+], function (
+  module, declare, topic, construct, style, Deferred, lang,
+  DropDownButton, DijitFix, TooltipDialog, popup,
+  value
+) {
 
   return declare([DropDownButton, DijitFix], { //--noindent--
 
     tooltipDialogClass: "", // css class to pass to the tooltipDialogClass
+
+    /**
+     * Widget class to instanciate for dropdown
+     *
+     * @type {array(string)}
+     */
+    refreshTopics: null,
 
     /**
      * @override
@@ -64,6 +77,13 @@ define([
       this.whenDDLoaded = new Deferred();
       this.inherited(arguments);
       this.ddOptions = lang.mixin({}, this.ddOptions);
+
+      if (this.refreshTopics !== null) {
+        for (var i = 0; i < this.refreshTopics.length; i++) {
+          console.log(this, "Subscribing to '" + this.refreshTopics[i] + "'");
+          topic.subscribe(this.refreshTopics[i], lang.hitch(this, this.refresh));
+        }
+      }
     },
 
     /**
@@ -229,6 +249,11 @@ define([
       } else {
         this.ddOptions[name] = value;
       }
+    },
+
+    refresh: function () {
+      console.log("Refreshing", this);
+      this.removeSubWidget();
     },
 
     declaredClass: module.id

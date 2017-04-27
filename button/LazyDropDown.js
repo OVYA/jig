@@ -55,6 +55,8 @@ define([
      */
     whenDDLoaded: null,
 
+    reloadSubWidget: null,
+
     /**
      * @override
      */
@@ -184,6 +186,14 @@ define([
      * @override
      */
     closeDropDown: function ( /*Boolean*/ focus) {
+
+      if (this.reloadSubWidget) {
+        if (this.subWidget.domNode.parentNode) {
+          this.subWidget.domNode.parentNode.removeChild(this.subWidget.domNode);
+        }
+        this._isJigLoaded = false;
+      }
+
       if (this.subWidget && this.subWidget.onHide) {
         this.subWidget.onHide(this);
       }

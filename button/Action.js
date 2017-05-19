@@ -146,8 +146,8 @@ define([
       }
       domClass.add(this.domNode, this["class"] + " " + this.extraClass + " " + this.cssClasses);
       if (this.domNode.nodeName !== 'A' || this.connectA) {
-        on(this.domNode, 'click', lang.hitch(this, this.onClick));
         on(this.domNode, 'touchstart', lang.hitch(this, this.onClick));
+        this.connect(this.domNode, 'onclick', 'onClick');
       }
     },
 

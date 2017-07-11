@@ -128,8 +128,10 @@ define([
 
     connectA: true,
 
+    lastClickTime: null,
+
     buildRendering: function () {
-      //console.log('buildRendering', this, arguments);
+
       if (this.srcNodeRef) {
         this.domNode = construct.create(this.srcNodeRef.nodeName);
         array.forEach(this.srcNodeRef.childNodes,
@@ -147,7 +149,7 @@ define([
       domClass.add(this.domNode, this["class"] + " " + this.extraClass + " " + this.cssClasses);
       if (this.domNode.nodeName !== 'A' || this.connectA) {
         on(this.domNode, 'touchstart', lang.hitch(this, this.onClick));
-        this.connect(this.domNode, 'onclick', 'onClick');
+        on(this.domNode, 'click', lang.hitch(this, this.onClick));
       }
     },
 
@@ -179,6 +181,14 @@ define([
     },
 
     onClick: function (evt) {
+
+      var now = new Date().getTime();
+      if (this.lastClickTime !== null && now - this.lastClickTime < 500) {
+        event.stop(evt);
+        return;
+      }
+      this.lastClickTime = now;
+
       if (this.domNode.nodeName === 'A') {
         if (this.disabled) {
           event.stop(evt);

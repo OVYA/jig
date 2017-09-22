@@ -1,14 +1,11 @@
 /**
  * Utility functions dealing with angles
  */
-define([
-  "dojo/_base/lang",
-  "dojo/number"
-], function(lang, dojoNumber) {
+define(["dojo/_base/lang", "dojo/number"], function(lang, dojoNumber) {
+  var self = {
+    //--noindent--
 
-var self = { //--noindent--
-
-  /**
+    /**
    * Format a number
    *
    * Forwarded to dojo/number/format, but before, the number is
@@ -17,25 +14,24 @@ var self = { //--noindent--
    * @param {number} value
    * @param {Object} options
    * @return {string}
-   * @nosideeffects
+   *
    */
-  format: function(value, options) {
-    if (options && options.digits) {
-      var factor = 1;
+    format: function(value, options) {
+      if (options && options.digits) {
+        var factor = 1;
 
-      if (value !== 0) {
-        var nb = Math.ceil(Math.log(value) / Math.LN10);
-        factor = nb < options.digits ? Math.pow(10, options.digits - nb) : 1;
+        if (value !== 0) {
+          var nb = Math.ceil(Math.log(value) / Math.LN10);
+          factor = nb < options.digits ? Math.pow(10, options.digits - nb) : 1;
+        }
+
+        value = Math.round(value * factor) / factor;
       }
 
-      value = Math.round(value * factor) / factor;
-    }
+      return dojoNumber.format(value, options);
+    },
 
-    return dojoNumber.format(value, options);
-  },
-
-
-  /**
+    /**
    * Format an array of numbers (called "dimensions")
    *
    * Can typically work on 2D or 3D coordinates, sizes...
@@ -59,37 +55,48 @@ var self = { //--noindent--
    *
    *      Specify options.mult for no-SI units (ex: KiB, MiB use 1024)
    * @return {string}
-   * @nosideeffects
+   *
    */
-  formatDims: function(dims, options) {
-    var o = lang.mixin({
-      units: [ '', 'K', 'M' ],
-      mult: 1000,
-      preci: 0.1,
-      joinSep: ' ; ',
-      decimalSep: ','
-    }, options);
-    var max = Math.max.apply(null, dims),
-      logNp = function(x, base) {
-        return Math.max(0, Math.floor(Math.log(x) / Math.log(base))); },
-      exp = Math.min(logNp(max, o.mult), o.units.length - 1),
-      getU = function(x) { return x < 0 ? x :
-                           Math.round((x / Math.pow(o.mult, exp)) *
-                                      (1 / o.preci)) / (1 / o.preci); },
-      commaR = function(s) { return (''+s).replace(/\./, o.decimalSep); },
-      ndims = dims.map(function(n) { return commaR(getU(n)); }),
-      str = ndims.join(o.joinSep) + ' ' + o.units[exp];
+    formatDims: function(dims, options) {
+      var o = lang.mixin(
+        {
+          units: ["", "K", "M"],
+          mult: 1000,
+          preci: 0.1,
+          joinSep: " ; ",
+          decimalSep: ","
+        },
+        options
+      );
+      var max = Math.max.apply(null, dims),
+        logNp = function(x, base) {
+          return Math.max(0, Math.floor(Math.log(x) / Math.log(base)));
+        },
+        exp = Math.min(logNp(max, o.mult), o.units.length - 1),
+        getU = function(x) {
+          return x < 0
+            ? x
+            : Math.round(x / Math.pow(o.mult, exp) * (1 / o.preci)) /
+                (1 / o.preci);
+        },
+        commaR = function(s) {
+          return ("" + s).replace(/\./, o.decimalSep);
+        },
+        ndims = dims.map(function(n) {
+          return commaR(getU(n));
+        }),
+        str = ndims.join(o.joinSep) + " " + o.units[exp];
 
-    return str;
-  },
+      return str;
+    },
 
-  formatBytes: function(size) {
-    return self.formatDims([size],
-                           { units: ['o', 'ko', 'Mo', 'Go', 'To'], mult: 1024 });
-  }
-
-};
+    formatBytes: function(size) {
+      return self.formatDims([size], {
+        units: ["o", "ko", "Mo", "Go", "To"],
+        mult: 1024
+      });
+    }
+  };
 
   return self;
-
 });

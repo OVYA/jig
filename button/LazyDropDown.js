@@ -69,6 +69,11 @@ define([
     whenDDLoaded: null,
 
     /**
+     * Reload the subwidget after each click on the lazydropdown
+     */
+    reloadSubWidget: null,
+
+    /**
      * @override
      */
     postMixInProperties: function () {
@@ -204,6 +209,14 @@ define([
      * @override
      */
     closeDropDown: function ( /*Boolean*/ focus) {
+
+      if (this.reloadSubWidget) {
+        if (this.subWidget.domNode.parentNode) {
+          this.subWidget.domNode.parentNode.removeChild(this.subWidget.domNode);
+        }
+        this._isJigLoaded = false;
+      }
+
       if (this.subWidget && this.subWidget.onHide) {
         this.subWidget.onHide(this);
       }

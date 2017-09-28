@@ -3,16 +3,10 @@
  *
  * @see geonef/jig/data/model
  */
-define([
-  "./model",
-  "dojo/_base/lang"
-], function(model, lang) {
-
+define(["./model", "dojo/_base/lang"], function(model, lang) {
   return {
-
-
     normalize: function(mid, toAbsMid) {
-      return (/^\./.test(mid)) ? toAbsMid(mid) : mid;
+      return /^\./.test(mid) ? toAbsMid(mid) : mid;
     },
 
     load: function(mid, require, load) {
@@ -21,8 +15,5 @@ define([
         load(store);
       });
     }
-
   };
-
 });
-

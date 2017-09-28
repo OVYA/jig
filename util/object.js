@@ -1,16 +1,13 @@
 /**
  * Object utilities
  */
-define([
-  "dojo/has",
-  "dojo/_base/lang"
-], function(has, lang) {
-
+define(["dojo/has", "dojo/_base/lang"], function(has, lang) {
   var h = lang.hitch;
 
-var self = { //--noindent--
+  var self = {
+    //--noindent--
 
-  /**
+    /**
    * Comme dojo/mixin, avec validation - utilisé par les constructeurs
    *
    * Valide que les options doivent exister dans la chaîne de prototypes
@@ -19,42 +16,50 @@ var self = { //--noindent--
    * @type {Object} obj
    * @type {!Object} options
    */
-  mixOptions: function(obj, options) {
-    if (has("geonef-debug-args")) { // todo: set statically
-      if (options) {
-        // we want inherited properties
-        for (var k in options) {
-          if (obj[k] === undefined) {
-            console.warn("mixOptions(): invalid option", k, "given to object", obj,
-                          "(options object is:", options, ")");
+    mixOptions: function(obj, options) {
+      if (has("geonef-debug-args")) {
+        // todo: set statically
+        if (options) {
+          // we want inherited properties
+          for (var k in options) {
+            if (obj[k] === undefined) {
+              console.warn(
+                "mixOptions(): invalid option",
+                k,
+                "given to object",
+                obj,
+                "(options object is:",
+                options,
+                ")"
+              );
+            }
+            obj[k] = options[k];
           }
-          obj[k] = options[k];
         }
+      } else {
+        lang.mixin(obj, options);
       }
-    } else {
-      lang.mixin(obj, options);
-    }
-    return obj;
-  },
+      return obj;
+    },
 
-  /**
+    /**
    * Transform object properties to array items
    *
    * @param {Object} obj Object to process
    * @return {Array}
    */
-  toArray: function(obj) {
-    var arr = [];
-    for (var key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        arr.push(obj[key]);
+    toArray: function(obj) {
+      var arr = [];
+      for (var key in obj) {
+        if (obj.hasOwnProperty(key)) {
+          arr.push(obj[key]);
+        }
       }
-    }
 
-    return arr;
-  },
+      return arr;
+    },
 
-  /**
+    /**
    * Same as dojo.map, but also works with objects.
    *
    * If an array is given, it's the same than dojo.map.
@@ -69,21 +74,21 @@ var self = { //--noindent--
    * @param {Object=} thisObj object to bind to callback function as "this"
    * @return {Object}
    */
-  map: function(obj, func, thisObj) {
-    if (obj instanceof Array) {
-      return obj.map(func, thisObj);
-    }
-    var newObj = {};
-    func = h(thisObj, func);
-    for (var key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        newObj[key] = func(obj[key], key, obj);
+    map: function(obj, func, thisObj) {
+      if (obj instanceof Array) {
+        return obj.map(func, thisObj);
       }
-    }
-    return newObj;
-  },
+      var newObj = {};
+      func = h(thisObj, func);
+      for (var key in obj) {
+        if (obj.hasOwnProperty(key)) {
+          newObj[key] = func(obj[key], key, obj);
+        }
+      }
+      return newObj;
+    },
 
-  /**
+    /**
    * Same as dojo.filter, but also works with objects.
    *
    * If an array is given, it's the same than dojo.filter.
@@ -100,30 +105,30 @@ var self = { //--noindent--
    * @param {function(*, string|number, Object|Array): boolean} func callback function
    * @param {Object=} thisObj object to bind to callback function as "this"
    */
-  filter: function(obj, func, thisObj) {
-    if (obj instanceof Array) {
-      return obj.filter(func, thisObj);
-    }
-    var newObj = {};
-    func = h(thisObj, func);
-    for (var key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        if (!!func(obj[key], key, obj)) {
-          newObj[key] = obj[key];
+    filter: function(obj, func, thisObj) {
+      if (obj instanceof Array) {
+        return obj.filter(func, thisObj);
+      }
+      var newObj = {};
+      func = h(thisObj, func);
+      for (var key in obj) {
+        if (obj.hasOwnProperty(key)) {
+          if (!!func(obj[key], key, obj)) {
+            newObj[key] = obj[key];
+          }
         }
       }
-    }
-    return newObj;
-  },
+      return newObj;
+    },
 
-  // we should have a different name for working on objects
-  // (to avoid confusion between objects and arrays)
-  // dojox.lang.functional
-  // dojox.lang.functional.forIn
-  // http://dojo-toolkit.33424.n3.nabble.com/For-in-helpers-td812651.html
-  // http://mail.dojotoolkit.org/pipermail/dojo-interest/2010-May/046043.html
+    // we should have a different name for working on objects
+    // (to avoid confusion between objects and arrays)
+    // dojox.lang.functional
+    // dojox.lang.functional.forIn
+    // http://dojo-toolkit.33424.n3.nabble.com/For-in-helpers-td812651.html
+    // http://mail.dojotoolkit.org/pipermail/dojo-interest/2010-May/046043.html
 
-  /**
+    /**
    * Same as dojo.forEach, but also works with objects.
    *
    * If an array is given, it's the same than dojo.forEach.
@@ -139,20 +144,20 @@ var self = { //--noindent--
    * @param {function(*, string|number, Object|Array)} func callback function
    * @param {Object=} thisObj object to bind to callback function as "this"
    */
-  forEach: function(obj, func, thisObj) {
-    if (obj instanceof Array) {
-      return obj.forEach(func, thisObj);
-    }
-    func = h(thisObj, func);
-    for (var key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        func(obj[key], key, obj);
+    forEach: function(obj, func, thisObj) {
+      if (obj instanceof Array) {
+        return obj.forEach(func, thisObj);
       }
-    }
-    return obj;
-  },
+      func = h(thisObj, func);
+      for (var key in obj) {
+        if (obj.hasOwnProperty(key)) {
+          func(obj[key], key, obj);
+        }
+      }
+      return obj;
+    },
 
-  /**
+    /**
    * Same as dojo.indexOf, but also works with objects
    *
    * If an array is given, it's the same than dojo.indexOf.
@@ -164,20 +169,18 @@ var self = { //--noindent--
    * @param {!Object|Array} haystack object or array to search
    * @param {!*}            needle   value to search for
    */
-  indexOf: function(haystack, needle) {
-    if (haystack instanceof Array) {
-      return haystack.indexOf(needle);
-    }
-    for (var i in haystack) {
-      if (haystack.hasOwnProperty(i) && haystack[i] === needle) {
-        return i;
+    indexOf: function(haystack, needle) {
+      if (haystack instanceof Array) {
+        return haystack.indexOf(needle);
       }
+      for (var i in haystack) {
+        if (haystack.hasOwnProperty(i) && haystack[i] === needle) {
+          return i;
+        }
+      }
+      return -1;
     }
-    return -1;
-  }
-
-};
+  };
 
   return self;
-
 });

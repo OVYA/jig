@@ -22,76 +22,72 @@
  * @see geonef/jig/data/model/ModelStore
  * @see geonef/jig/data/model/Abstract
  */
-define([
-  "./model/ModelStore",
-  "dojo/_base/lang"
-], function(ModelStore, lang) {
+define(["./model/ModelStore", "dojo/_base/lang"], function(ModelStore, lang) {
+  var self = {
+    //--noindent--
 
-var self = { //--noindent--
+    _stores: {},
 
-  _stores: {},
-
-  /**
+    /**
    * Get store for corresponding model
    *
    * @param {geonef/jig/data/model/Abstract} Model
    * @return {geonef/jig/data/model/ModelStore}
    */
-  getStore: function(Model) {
-    var stores = self._stores;
-    var classId = Model.prototype.declaredClass;
-    if (!stores[classId]) {
-      var _Class = Model.prototype.Store || ModelStore;
-      stores[classId] = new _Class({ Model: Model });
-    }
+    getStore: function(Model) {
+      var stores = self._stores;
+      var classId = Model.prototype.declaredClass;
+      if (!stores[classId]) {
+        var _Class = Model.prototype.Store || ModelStore;
+        stores[classId] = new _Class({ Model: Model });
+      }
 
-    return stores[classId];
-  },
+      return stores[classId];
+    },
 
-  /**
+    /**
    * Transform given properties definition into canonical form (used for Model's property declaration)
    *
    * @deprecated Should not be needed (is for backward compat)
    * @param {Object.<string,Object>} props
    * @return {Object}
    */
-  normalizeProperties: function(props) {
-    for (var p in props) if (props.hasOwnProperty(p)) {
-      if (typeof props[p] != 'object') {
-        props[p] = { type: props[p] };
-      }
-      if (props[p].readOnly !== true && props[p].readOnly !== false) {
-        props[p].readOnly = false;
-      }
+    normalizeProperties: function(props) {
+      for (var p in props)
+        if (props.hasOwnProperty(p)) {
+          if (typeof props[p] != "object") {
+            props[p] = { type: props[p] };
+          }
+          if (props[p].readOnly !== true && props[p].readOnly !== false) {
+            props[p].readOnly = false;
+          }
+        }
+      return props;
     }
-    return props;
-  }
 
-  // /**
-  //  * Flatten value recursively
-  //  *
-  //  * It processes model objects and array recursively to produce
-  //  * a result made of only scalar values and dumb objects and arrays.
-  //  *
-  //  * @param {mixed} object
-  //  * @return {mixed}
-  //  */
-  // flatten: function(value) {
-  //   if (dojo/isArray(value)) {
-  //     return value.map(self.flatten);
-  //   } else if (dojo/isObject(value) && value) {
-  //     // if (value.exportProperties) {
-  //     //   value = value.exportProperties();
-  //     // }
-  //     return dojo/mixin({}, value);
-  //     // return geonef/jig/map(value, self.flatten); // infinite loop
-  //   } else {
-  //     return value;
-  //   }
-  // }
-};
+    // /**
+    //  * Flatten value recursively
+    //  *
+    //  * It processes model objects and array recursively to produce
+    //  * a result made of only scalar values and dumb objects and arrays.
+    //  *
+    //  * @param {mixed} object
+    //  * @return {mixed}
+    //  */
+    // flatten: function(value) {
+    //   if (dojo/isArray(value)) {
+    //     return value.map(self.flatten);
+    //   } else if (dojo/isObject(value) && value) {
+    //     // if (value.exportProperties) {
+    //     //   value = value.exportProperties();
+    //     // }
+    //     return dojo/mixin({}, value);
+    //     // return geonef/jig/map(value, self.flatten); // infinite loop
+    //   } else {
+    //     return value;
+    //   }
+    // }
+  };
 
   return self;
-
 });
-

@@ -15,66 +15,83 @@
  *
  * @see geonef/jig/data/model/ModelStore
  */
-define([
-  "module",
-  "dojo/_base/declare",
-  "dojo/_base/lang",
-  "dojo/Deferred",
-  "dojo/promise/all",
-  "dojo/topic",
-  "dojo/when",
-  "dojo/promise/all",
+define(
+  [
+    "module",
+    "dojo/_base/declare",
+    "dojo/_base/lang",
+    "dojo/Deferred",
+    "dojo/promise/all",
+    "dojo/topic",
+    "dojo/when",
+    "dojo/promise/all",
 
-  "../model",
-  "../../util/value",
-  "../../util/string",
-  "../../util/array",
-  "../../util/object",
-  "../../util/async"
-], function(module, declare, lang, Deferred, allPromises, topic, when, whenAll,
-            model, value, string, array, object, async) {
+    "../model",
+    "../../util/value",
+    "../../util/string",
+    "../../util/array",
+    "../../util/object",
+    "../../util/async"
+  ],
+  function(
+    module,
+    declare,
+    lang,
+    Deferred,
+    allPromises,
+    topic,
+    when,
+    whenAll,
+    model,
+    value,
+    string,
+    array,
+    object,
+    async
+  ) {
+    var goThrough = function(value) {
+      return value;
+    };
+    var scalar = {
+      fromServer: goThrough,
+      toServer: goThrough
+    };
 
-
-  var goThrough = function(value) { return value; };
-  var scalar = {
-    fromServer: goThrough,
-    toServer: goThrough
-  };
-
-return declare(null, { //--noindent--
-  /**
+    return declare(null, {
+      //--noindent--
+      /**
    * Store class to use for this model.
    *
    * If null, default ModelStore is used.
    *
    * @type {Function}
    */
-  Store: null,
+      Store: null,
 
-  /**
+      /**
    * Channel on which to publish notifications
    *
    * @type {string}
    */
-  channel: 'model/default',
+      channel: "model/default",
 
-  /**
+      /**
    * Database identifier
    *
    * @type {string}
    */
-  id: undefined,
+      id: undefined,
 
-  /**
+      /**
    * Name of (string) property to use for the discriminator.
    *
    * See the 'discriminatorMap' property for explanations of this feature.
    *
    * @type {string}
    */
-  discriminatorProperty: undefined,
+      discriminatorProperty: undefined,
 
-  /**
+      /**
    * Map between discriminator values and model class names
    *
    * When a discriminator is defined (through 'discriminatorProperty'),
@@ -92,9 +109,9 @@ return declare(null, { //--noindent--
    *
    * @type {Object.<string,string>}
    */
-  discriminatorMap: {},
+      discriminatorMap: {},
 
-  /**
+      /**
    * List of properties
    *
    * It's in the form of an object whose keys are property names and values
@@ -121,11 +138,11 @@ return declare(null, { //--noindent--
    *
    * @type {Object.<string,Object>}
    */
-  properties: {
-    id: { type: 'string', readOnly: true }
-  },
+      properties: {
+        id: { type: "string", readOnly: true }
+      },
 
-  /**
+      /**
    * Implemented property types
    *
    * It's in the form of an object whose keys are type names and values
@@ -141,143 +158,175 @@ return declare(null, { //--noindent--
    *
    * @type {Object.<string,Object>}
    */
-  types: {
-    string: scalar,
-    integer: scalar,
-    'float': scalar,
-    'boolean': scalar,
-    'enum': scalar,
-    date: {
-      fromServer: function(dateStr) {
-        return dateStr ? new Date(dateStr) : null;
-      },
-      toServer: function(dateObj) {
-        return dateObj ? dateObj.toString() : null;
-      }
-    },
-    array: {
-      fromServer: function(value) {
-        return value instanceof Array ? value : [];
-      },
-      toServer: function(value) {
-        return value instanceof Array ? value : [];
-      }
-    },
-    hash: scalar,
-    refMany: {
-      fromServer: function(ar, type) {
-        if (!(ar instanceof Array)) { return []; }
-        return value.getModule(type.targetModel)
-          .then(function(_Class) {
-            var store = model.getStore(_Class);
-            return async.
-              whenAll(ar.filter(function(obj) { return !!obj.id; })
-                      .map(function(obj, idx) { return store.getLazyObject(obj); }));
-          })
-          .then(function(objList) {
-            if (type.chained) {
-              array.chainArray(objList);
+      types: {
+        string: scalar,
+        integer: scalar,
+        float: scalar,
+        boolean: scalar,
+        enum: scalar,
+        date: {
+          fromServer: function(dateStr) {
+            return dateStr ? new Date(dateStr) : null;
+          },
+          toServer: function(dateObj) {
+            return dateObj ? dateObj.toString() : null;
+          }
+        },
+        array: {
+          fromServer: function(value) {
+            return value instanceof Array ? value : [];
+          },
+          toServer: function(value) {
+            return value instanceof Array ? value : [];
+          }
+        },
+        hash: scalar,
+        refMany: {
+          fromServer: function(ar, type) {
+            if (!(ar instanceof Array)) {
+              return [];
             }
-            return objList;
-          });
-      },
-      toServer: function(ar, type) {
-        if (!(ar instanceof Array)) { return undefined; }
-        return ar.map(
-          function(obj) {
-            if (!obj.id) {
-              console.warn("refMany: toServer() will not cascade on new obj:", obj);
+            return value
+              .getModule(type.targetModel)
+              .then(function(_Class) {
+                var store = model.getStore(_Class);
+                return async.whenAll(
+                  ar
+                    .filter(function(obj) {
+                      return !!obj.id;
+                    })
+                    .map(function(obj, idx) {
+                      return store.getLazyObject(obj);
+                    })
+                );
+              })
+              .then(function(objList) {
+                if (type.chained) {
+                  array.chainArray(objList);
+                }
+                return objList;
+              });
+          },
+          toServer: function(ar, type) {
+            if (!(ar instanceof Array)) {
+              return undefined;
             }
-            return { id: obj.id };
-          });
-      }
-    },
-    refOne: {
-      fromServer: function(obj, type) {
-        if (obj === null) { return null; }
-        return value.getModule(type.targetModel)
-          .then(function(_Class) {
-            return model.getStore(_Class).getLazyObject(obj);
-          });
-      },
-      toServer: function(obj, type) {
-        // do not cascade: foreign objects have to be saved independantly
-        if (obj && !obj.id) {
-          console.warn("refOne: toServer() will not cascade on new obj:", obj);
+            return ar.map(function(obj) {
+              if (!obj.id) {
+                console.warn(
+                  "refMany: toServer() will not cascade on new obj:",
+                  obj
+                );
+              }
+              return { id: obj.id };
+            });
+          }
+        },
+        refOne: {
+          fromServer: function(obj, type) {
+            if (obj === null) {
+              return null;
+            }
+            return value.getModule(type.targetModel).then(function(_Class) {
+              return model.getStore(_Class).getLazyObject(obj);
+            });
+          },
+          toServer: function(obj, type) {
+            // do not cascade: foreign objects have to be saved independantly
+            if (obj && !obj.id) {
+              console.warn(
+                "refOne: toServer() will not cascade on new obj:",
+                obj
+              );
+            }
+
+            return obj && obj.id ? { id: obj.id } : null;
+          }
+        },
+        embedMany: {
+          fromServer: function(ar, type) {
+            // same as 'refMany'
+            if (!(ar instanceof Array)) {
+              return [];
+            }
+            return value
+              .getModule(type.targetModel)
+              .then(function(_Class) {
+                var store = model.getStore(_Class);
+                return async.whenAll(
+                  ar
+                    .filter(function(obj) {
+                      return !!obj.id;
+                    })
+                    .map(function(obj) {
+                      return store.getLazyObject(obj);
+                    })
+                );
+              })
+              .then(function(objList) {
+                if (type.chained) {
+                  array.chainArray(objList);
+                }
+                return objList;
+              });
+          },
+          toServer: function(ar, type) {
+            if (!(ar instanceof Array)) {
+              return undefined;
+            }
+            return whenAll(
+              ar.map(function(item) {
+                return item.toServerValue({ allValues: true });
+              })
+            );
+          }
         }
-
-        return obj && obj.id ? { id: obj.id } : null;
-      }
-    },
-    embedMany: {
-      fromServer: function(ar, type) { // same as 'refMany'
-        if (!(ar instanceof Array)) { return []; }
-        return value.getModule(type.targetModel)
-          .then(function(_Class) {
-            var store = model.getStore(_Class);
-            return async.
-              whenAll(ar.filter(function(obj) { return !!obj.id; })
-                      .map(function(obj) { return store.getLazyObject(obj); }));
-          })
-          .then(function(objList) {
-            if (type.chained) {
-              array.chainArray(objList);
-            }
-            return objList;
-          });
       },
-      toServer: function(ar, type) {
-        if (!(ar instanceof Array)) { return undefined; }
-        return whenAll(ar.map(function(item) {
-          return item.toServerValue({ allValues: true });
-        }));
-      }
-    }
-  },
 
-  /**
+      /**
    * Store to which this obj belong to
    *
    * @type {geonef/jig/data/model/ModelStore} store
    */
-  store: null,
+      store: null,
 
-  /**
+      /**
    * Hash of original values
    *
    * @type {Object}
    */
-  originalValues: {},
+      originalValues: {},
 
+      constructor: function(options) {
+        if (options) {
+          lang.mixin(this, options);
+        }
+        this.originalValues = lang.mixin({}, this.originalValues);
+        this.init();
+      },
 
-  constructor: function(options) {
-    if (options) {
-      lang.mixin(this, options);
-    }
-    this.originalValues = lang.mixin({}, this.originalValues);
-    this.init();
-  },
+      destroy: function() {
+        if (this._subcr) {
+          this._subcr.forEach(function(c) {
+            c.remove();
+          });
+          delete this._subcr;
+        }
+      },
 
-  destroy: function() {
-    if (this._subcr) {
-      this._subcr.forEach(function(c) { c.remove(); });
-      delete this._subcr;
-    }
-  },
-
-  /**
+      /**
    * @protected
    */
-  init: function() {},
+      init: function() {},
 
-  /** hook */
-  initNew: function() {},
+      /** hook */
+      initNew: function() {},
 
-  getRef: function() {
-    return this.store.idToRef(this.id);
-  },
+      getRef: function() {
+        return this.store.idToRef(this.id);
+      },
 
-  /**
+      /**
    * Get value of given property - asynchronous
    *
    * For any "foo" property, the method "getFoo" is checked for existence.
@@ -290,33 +339,33 @@ return declare(null, { //--noindent--
    * @param {string} property   Name of property
    * @return {dojo/Deferred}
    */
-  get: function(property) {
-    var set, value;
-    var ucProp = string.ucFirst(property);
-    var meth = 'get' + ucProp;
-    if (this[meth]) {
-      value = this[meth]();
-    } else {
-      meth = 'is' + ucProp;
-      if (this[meth]) {
-        value = this[meth]();
-      }
-    }
-    if (value !== undefined) {
-      if (value instanceof Deferred) {
-        return value;
-      }
-      return async.bindArg(value);
-    }
-    if (this[property] !== undefined || !this.id) {
-      return async.bindArg(this[property]);
-    }
-    return this.store
-      .fetchProps(this, [property])
-      .then(function(obj) { return obj[property]; });
-  },
+      get: function(property) {
+        var set, value;
+        var ucProp = string.ucFirst(property);
+        var meth = "get" + ucProp;
+        if (this[meth]) {
+          value = this[meth]();
+        } else {
+          meth = "is" + ucProp;
+          if (this[meth]) {
+            value = this[meth]();
+          }
+        }
+        if (value !== undefined) {
+          if (value instanceof Deferred) {
+            return value;
+          }
+          return async.bindArg(value);
+        }
+        if (this[property] !== undefined || !this.id) {
+          return async.bindArg(this[property]);
+        }
+        return this.store.fetchProps(this, [property]).then(function(obj) {
+          return obj[property];
+        });
+      },
 
-  /**
+      /**
    * Request value of differents properties
    *
    * The returned promise will be resolved when the specified properties
@@ -325,124 +374,144 @@ return declare(null, { //--noindent--
    * @param {Array.<string>} propArray array of property names
    * @return {dojo/Deferred}
    */
-  requestProps: function(propArray) {
-    var _this = this;
-    return async.bindArg(this, allPromises(
-      propArray.map(function(prop) { return _this.get(prop); })));
-  },
+      requestProps: function(propArray) {
+        var _this = this;
+        return async.bindArg(
+          this,
+          allPromises(
+            propArray.map(function(prop) {
+              return _this.get(prop);
+            })
+          )
+        );
+      },
 
-  /**
+      /**
    * Set a given property to given value
    *
    * @param {string} property
    * @param any value
    */
-  set: function(property, value, setAsOriginal) {
-    var setter = this['set'+string.ucFirst(property)];
-    if (setter) {
-      setter.call(this, value);
-    } else {
-      this[property] = value;
-    }
-    if (setAsOriginal) {
-      this.setOriginalValue(property, value);
-    }
-  },
+      set: function(property, value, setAsOriginal) {
+        var setter = this["set" + string.ucFirst(property)];
+        if (setter) {
+          setter.call(this, value);
+        } else {
+          this[property] = value;
+        }
+        if (setAsOriginal) {
+          this.setOriginalValue(property, value);
+        }
+      },
 
-  /**
+      /**
    * @return {Object} object of all (available) values
    */
-  getProps: function() {
-    var p;
-    var props = this.properties;
-    var obj = {};
-    for (p in props) {
-      if (typeof props[p] == 'object' && props[p].type && this[p] !== undefined) {
-        // var typeSpec = props[p];
-        // if (includeReadOnly ||
-        //     (!typeSpec.readOnly && !typeSpec.noEdit)) {
-        obj[p] = this[p];
-        // }
-      }
-    }
+      getProps: function() {
+        var p;
+        var props = this.properties;
+        var obj = {};
+        for (p in props) {
+          if (
+            typeof props[p] == "object" &&
+            props[p].type &&
+            this[p] !== undefined
+          ) {
+            // var typeSpec = props[p];
+            // if (includeReadOnly ||
+            //     (!typeSpec.readOnly && !typeSpec.noEdit)) {
+            obj[p] = this[p];
+            // }
+          }
+        }
 
-    return obj;
-  },
+        return obj;
+      },
 
-  /**
+      /**
    * Set multiple properties at once
    *
    * @param {Object} object     object of properties/values
    */
-  setProps: function(object) {
-    for (var p in object) if (object.hasOwnProperty(p)) {
-      this.set(p, object[p]);
-    }
-  },
+      setProps: function(object) {
+        for (var p in object)
+          if (object.hasOwnProperty(p)) {
+            this.set(p, object[p]);
+          }
+      },
 
-
-  /**
+      /**
    * Get object ID
    *
    * @return {string}
    */
-  getId: function() {
-    return this.id;
-  },
+      getId: function() {
+        return this.id;
+      },
 
-  /**
+      /**
    * Set object ID - called by ModelStore after new obj is persisted (private use)
    *
    * @param {string} id
    */
-  setId: function(id) {
-    this.id = id;
-  },
+      setId: function(id) {
+        this.id = id;
+      },
 
-  /**
+      /**
    * Get short string, text summary about the object
    *
    * This would typically return the value of the 'name' or 'title' property.
    *
    * @return {string}
    */
-  getSummary: function() {
-    return this.getId();
-  },
+      getSummary: function() {
+        return this.getId();
+      },
 
-  /**
+      /**
    * Set properties as fetched from the server
    *
    * @param {Object} props
    * @return {dojo/Deferred}
    */
-  fromServerValue: function(props, options) {
-    options = object.mixOptions({
-      setOriginal: true
-    }, options);
+      fromServerValue: function(props, options) {
+        options = object.mixOptions(
+          {
+            setOriginal: true
+          },
+          options
+        );
 
-    var _this = this;
+        var _this = this;
 
-    return allPromises(object.map(props, function(prop, p) {
-      var typeSpec = this.properties[p];
-      if (!typeSpec) {
-        return null;
-      }
+        return allPromises(
+          object.map(
+            props,
+            function(prop, p) {
+              var typeSpec = this.properties[p];
+              if (!typeSpec) {
+                return null;
+              }
 
-      var type = this.types[typeSpec.type];
+              var type = this.types[typeSpec.type];
 
-      return when(type.fromServer.call(this, prop, typeSpec))
-        .then(function(value) {
-          _this[p] = value;
-          if (options.setOriginal) {
-            _this.setOriginalValue(p, prop);
-          }
-          return value;
-        });
-    }, this));
-  },
+              return when(
+                type.fromServer.call(this, prop, typeSpec)
+              ).then(function(value) {
+                _this[p] = value;
+                if (options.setOriginal) {
+                  _this.setOriginalValue(p, prop);
+                }
+                return value;
+              });
+            },
+            this
+          )
+        );
+      },
 
-  /**
+      /**
    * Return properties as they should be sent to the server
    *
    * TODO: allow types' toServer() return promises
@@ -459,182 +528,201 @@ return declare(null, { //--noindent--
    * @param {!Object} options
    * @return {dojo/Deferred}
    */
-  toServerValue: function(options) {
-    options = object.mixOptions({
-      setOriginal: false,
-      allValues: false
-    }, options);
+      toServerValue: function(options) {
+        options = object.mixOptions(
+          {
+            setOriginal: false,
+            allValues: false
+          },
+          options
+        );
 
-    var p, type, _value, _this = this;;
-    var props = this.properties;
-    var struct = {};
-    var originalValues = this.originalValues;
-    var deferreds = [];
+        var p,
+          type,
+          _value,
+          _this = this;
+        var props = this.properties;
+        var struct = {};
+        var originalValues = this.originalValues;
+        var deferreds = [];
 
-    if (this.id) {
-      struct.id = this.id;
-    }
-    for (p in props) if (typeof props[p] == 'object' && props[p].type) {
-      _value = this[p];
-      if (_value !== undefined) {
-        var typeSpec = props[p];
-        type = this.types[typeSpec.type];
-        if (typeSpec.readOnly ||
-            (typeSpec.noEdit && this.id)) {
-          continue;
+        if (this.id) {
+          struct.id = this.id;
         }
-
-        _value = type.toServer.call(this, _value, typeSpec);
-
-        deferreds.push(
-          when(_value).then(function(_value) {
+        for (p in props)
+          if (typeof props[p] == "object" && props[p].type) {
+            _value = this[p];
             if (_value !== undefined) {
-              var original = originalValues[p];
-
-              if (options.allValues ||
-                  !value.isSame(_value, originalValues[p])) {
-                struct[p] = _value;
-
-                if (options.setOriginal) {
-                  _this.setOriginalValue(_value);
-                }
+              var typeSpec = props[p];
+              type = this.types[typeSpec.type];
+              if (typeSpec.readOnly || (typeSpec.noEdit && this.id)) {
+                continue;
               }
+
+              _value = type.toServer.call(this, _value, typeSpec);
+
+              deferreds.push(
+                when(_value).then(function(_value) {
+                  if (_value !== undefined) {
+                    var original = originalValues[p];
+
+                    if (
+                      options.allValues ||
+                      !value.isSame(_value, originalValues[p])
+                    ) {
+                      struct[p] = _value;
+
+                      if (options.setOriginal) {
+                        _this.setOriginalValue(_value);
+                      }
+                    }
+                  }
+                })
+              );
             }
-          }));
-      }
-    }
+          }
 
-    return whenAll(deferreds).then(function() {
-      var discrProp = _this.discriminatorProperty;
-      if (options.allValues && discrProp && _this[discrProp]) {
-        struct[discrProp] = _this[discrProp];
-      }
+        return whenAll(deferreds).then(function() {
+          var discrProp = _this.discriminatorProperty;
+          if (options.allValues && discrProp && _this[discrProp]) {
+            struct[discrProp] = _this[discrProp];
+          }
 
-      return struct;
-    });
-  },
+          return struct;
+        });
+      },
 
-  setOriginalValue: function(name, _value) {
-    this.originalValues[name] = _value;
-  },
+      setOriginalValue: function(name, _value) {
+        this.originalValues[name] = _value;
+      },
 
-  /**
+      /**
    * Create a member object within an EmbedMany property
    *
    * @public
    * @param {string} propName name of embedMany property
    * @param {dojo/Deferred} subObject
    */
-  createSub: function(propName, data) {
-      var property = this.properties[propName];
-    var _this = this;
-    return value.getModule(property.targetModel)
-      .then(function(TargetModel) { return model.getStore(TargetModel); })
-      .then(function(store) {
-        return _this.store.apiRequest({
-          action: 'createSub', id: _this.id,
-          propName: propName, data: data
-        }).then(function(resp) {
-          return store.getLazyObject(resp.subObject)
-            .then(function(sub) {
-              _this[propName].push(sub);
-              _this.publish(['afterPut']);
-              return sub;
-            });
-        });
-      });
-  },
+      createSub: function(propName, data) {
+        var property = this.properties[propName];
+        var _this = this;
+        return value
+          .getModule(property.targetModel)
+          .then(function(TargetModel) {
+            return model.getStore(TargetModel);
+          })
+          .then(function(store) {
+            return _this.store
+              .apiRequest({
+                action: "createSub",
+                id: _this.id,
+                propName: propName,
+                data: data
+              })
+              .then(function(resp) {
+                return store.getLazyObject(resp.subObject).then(function(sub) {
+                  _this[propName].push(sub);
+                  _this.publish(["afterPut"]);
+                  return sub;
+                });
+              });
+          });
+      },
 
-  /**
+      /**
    * Duplicate a member object within an EmbedMany property
    *
    * @public
    * @param {string} propName name of embedMany property
    * @param {dojo/Deferred} subObject
    */
-  duplicateSub: function(propName, subObject) {
-    var store = subObject.store;
-    var _this = this;
-    var deferred = this.store.apiRequest({
-      action: 'duplicateSub',
-      id: this.id,
-      propName: propName,
-      subId: subObject.id
-    }).then(function(resp) { return store.getLazyObject(resp.subObject); })
-      .then(function(sub) {
-        _this[propName].push(sub);
-        _this.publish(['afterPut']);
-        return sub;
-      });
+      duplicateSub: function(propName, subObject) {
+        var store = subObject.store;
+        var _this = this;
+        var deferred = this.store
+          .apiRequest({
+            action: "duplicateSub",
+            id: this.id,
+            propName: propName,
+            subId: subObject.id
+          })
+          .then(function(resp) {
+            return store.getLazyObject(resp.subObject);
+          })
+          .then(function(sub) {
+            _this[propName].push(sub);
+            _this.publish(["afterPut"]);
+            return sub;
+          });
 
-    _this.publish(['put']);
+        _this.publish(["put"]);
 
-    return deferred;
-  },
+        return deferred;
+      },
 
-  /**
+      /**
    * Delete a member object from an EmbedMany property
    *
    * @public
    * @param {string} propName name of embedMany property
    * @param {geonef/jig/data/model/Abstract} subObject
    */
-  deleteSub: function(propName, subObject) {
-    var store = subObject.store;
-    var _this = this;
-    var deferred = this.store.apiRequest(
-      { action: 'deleteSub', id: this.id,
-        propName: propName, subId: subObject.id })
-      .then(function(resp) {
-        var idx = _this[propName].indexOf(subObject);
-        if (idx !== -1) {
-          _this[propName].splice(idx, 1);
-        }
-        _this.publish(['afterPut']);
+      deleteSub: function(propName, subObject) {
+        var store = subObject.store;
+        var _this = this;
+        var deferred = this.store
+          .apiRequest({
+            action: "deleteSub",
+            id: this.id,
+            propName: propName,
+            subId: subObject.id
+          })
+          .then(function(resp) {
+            var idx = _this[propName].indexOf(subObject);
+            if (idx !== -1) {
+              _this[propName].splice(idx, 1);
+            }
+            _this.publish(["afterPut"]);
+          });
 
-      });
+        _this.publish(["put"]);
 
-    _this.publish(['put']);
+        return deferred;
+      },
 
-    return deferred;
-  },
-
-  /**
+      /**
    * Helper for dojo/topic.subscribe(), handling unsubscribe at destroy()
    */
-  subscribe: function(channel, callback) {
-    if (!this._subscr) {
-      this._subscr = [];
-    }
-    var _h = topic.subscribe(channel, lang.hitch(this, callback));
-    this._subscr.push(_h);
-    return _h;
-  },
+      subscribe: function(channel, callback) {
+        if (!this._subscr) {
+          this._subscr = [];
+        }
+        var _h = topic.subscribe(channel, lang.hitch(this, callback));
+        this._subscr.push(_h);
+        return _h;
+      },
 
-  /**
+      /**
    * Unsubscribe event registered with selfg subscribe()
    */
-  unsubscribe: function(_h) {
-    var idx = this._subscr.indexOf(_h);
-    _h.remove();
-    this._subscr.splice(idx, 1);
-  },
+      unsubscribe: function(_h) {
+        var idx = this._subscr.indexOf(_h);
+        _h.remove();
+        this._subscr.splice(idx, 1);
+      },
 
-  publish: function(argsArray) {
-    argsArray = argsArray.slice(0);
-    argsArray.unshift(this);
-    argsArray.unshift(this.channel);
-    topic.publish.apply(topic, argsArray);
-  },
+      publish: function(argsArray) {
+        argsArray = argsArray.slice(0);
+        argsArray.unshift(this);
+        argsArray.unshift(this.channel);
+        topic.publish.apply(topic, argsArray);
+      },
 
-  afterDuplicate: function() {
-  },
+      afterDuplicate: function() {},
 
-  afterDelete: function() {
-  },
+      afterDelete: function() {},
 
-  declaredClass: module.id
-
-});
-
-});
+      declaredClass: module.id
+    });
+  }
+);

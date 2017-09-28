@@ -3,264 +3,278 @@
  *
  * It must be given a 'ddClass', unless 'ddCreateFunc' is given.
  */
-define([
-  "module",
-  "dojo/_base/declare",
-  "dojo/topic",
-  "dojo/dom-construct",
-  "dojo/dom-style",
-  "dojo/Deferred",
-  "dojo/_base/lang",
+define(
+  [
+    "module",
+    "dojo/_base/declare",
+    "dojo/topic",
+    "dojo/dom-construct",
+    "dojo/dom-style",
+    "dojo/Deferred",
+    "dojo/_base/lang",
 
-  "dijit/form/DropDownButton",
-  "./DijitFix",
-  "dijit/TooltipDialog",
-  "dijit/popup",
+    "dijit/form/DropDownButton",
+    "./DijitFix",
+    "dijit/TooltipDialog",
+    "dijit/popup",
 
-  "../util/value"
-], function (
-  module, declare, topic, construct, style, Deferred, lang,
-  DropDownButton, DijitFix, TooltipDialog, popup,
-  value
-) {
+    "../util/value"
+  ],
+  function(
+    module,
+    declare,
+    topic,
+    construct,
+    style,
+    Deferred,
+    lang,
+    DropDownButton,
+    DijitFix,
+    TooltipDialog,
+    popup,
+    value
+  ) {
+    return declare([DropDownButton, DijitFix], {
+      //--noindent--
 
-  return declare([DropDownButton, DijitFix], { //--noindent--
+      tooltipDialogClass: "", // css class to pass to the tooltipDialogClass
 
-    tooltipDialogClass: "", // css class to pass to the tooltipDialogClass
-
-    /**
+      /**
      * Widget class to instanciate for dropdown
      *
      * @type {array(string)}
      */
-    refreshTopics: null,
+      refreshTopics: null,
 
-    /**
+      /**
      * @override
      */
-    label: 'DD',
+      label: "DD",
 
-    /**
+      /**
      * Widget class to instanciate for dropdown
      *
      * @type {Function|string}
      */
-    ddClass: null,
+      ddClass: null,
 
-    /**
+      /**
      * Options to give to 'ddClass' constructor
      *
      * @type {Object}
      */
-    ddOptions: {},
+      ddOptions: {},
 
-    /**
+      /**
      * Style object to apply to dd's domNode
      *
      * @type {Object}
      */
-    ddStyle: {},
+      ddStyle: {},
 
-    /**
+      /**
      * Promise when the dropdown widget is loaded (resolved to the widget)
      *
      * @type {dojo/Deferred}
      */
-    whenDDLoaded: null,
+      whenDDLoaded: null,
 
-    /**
+      /**
      * Reload the subwidget after each click on the lazydropdown
      */
-    reloadSubWidget: null,
+      reloadSubWidget: null,
 
-    /**
+      /**
      * @override
      */
-    postMixInProperties: function () {
-      this.whenDDLoaded = new Deferred();
-      this.inherited(arguments);
-      this.ddOptions = lang.mixin({}, this.ddOptions);
+      postMixInProperties: function() {
+        this.whenDDLoaded = new Deferred();
+        this.inherited(arguments);
+        this.ddOptions = lang.mixin({}, this.ddOptions);
 
-      if (this.refreshTopics !== null) {
-        for (var i = 0; i < this.refreshTopics.length; i++) {
-          console.log(this, "Subscribing to '" + this.refreshTopics[i] + "'");
-          topic.subscribe(this.refreshTopics[i], lang.hitch(this, this.refresh));
+        if (this.refreshTopics !== null) {
+          for (var i = 0; i < this.refreshTopics.length; i++) {
+            console.log(this, "Subscribing to '" + this.refreshTopics[i] + "'");
+            topic.subscribe(
+              this.refreshTopics[i],
+              lang.hitch(this, this.refresh)
+            );
+          }
         }
-      }
-    },
+      },
 
-    /**
+      /**
      * @override
      */
-    startup: function () {
-      if (this._started) {
-        return;
-      }
+      startup: function() {
+        if (this._started) {
+          return;
+        }
 
-      this.dropDown = {
-        _destroyed: true
-      };
-      // no parent has an interesting startup method
+        this.dropDown = {
+          _destroyed: true
+        };
+        // no parent has an interesting startup method
 
-      //this.dropDownContainer = null;	// hack to make parent (DropDownButton)
-      // to assume first widget in body as dropDown
-      // and leave isLoaded() do the proper work
-      //this.inherited(arguments);
-      //this.dropDown = null;
-    },
+        //this.dropDownContainer = null;	// hack to make parent (DropDownButton)
+        // to assume first widget in body as dropDown
+        // and leave isLoaded() do the proper work
+        //this.inherited(arguments);
+        //this.dropDown = null;
+      },
 
-    /**
+      /**
      * @override
      */
-    openDropDown: function () {
-      this.inherited(arguments);
-      if (this.subWidget && this.subWidget.onShow) {
-        this.subWidget.onShow(this);
-      }
-    },
+      openDropDown: function() {
+        this.inherited(arguments);
+        if (this.subWidget && this.subWidget.onShow) {
+          this.subWidget.onShow(this);
+        }
+      },
 
-    /**
+      /**
      * Loads the data for the dropdown, and at some point, calls the given callback
      *
      * @override
      */
-    loadDropDown: function (loadCallback) {
-      var _this = this;
+      loadDropDown: function(loadCallback) {
+        var _this = this;
 
-      this.createDropDownTooltip().then(function (dropDown) {
-        _this.dropDown = dropDown;
-        // _this.dropDown.defer(function() {
-        if (_this.subWidget) {
-          loadCallback();
-          _this.whenDDLoaded.resolve(_this.subWidget);
-        }
-        // }, 500);
-      });
-    },
+        this.createDropDownTooltip().then(function(dropDown) {
+          _this.dropDown = dropDown;
+          // _this.dropDown.defer(function() {
+          if (_this.subWidget) {
+            loadCallback();
+            _this.whenDDLoaded.resolve(_this.subWidget);
+          }
+          // }, 500);
+        });
+      },
 
-    /**
+      /**
      * Create the tooltip, including the dropdown (async)
      *
      * @return {dojo/Deferred}
      */
-    createDropDownTooltip: function () {
-      var dd = new TooltipDialog({
-        "class": this.tooltipDialogClass,
-        removeChild: lang.hitch(this, 'removeSubWidget')
-      });
-      var _this = this;
-      return this.widgetCreateFunc().then(function (subWidget) {
-        _this.subWidget = subWidget;
-        _this._isJigLoaded = !!_this.subWidget;
-        if (subWidget) {
-          _this.subWidget._floatAnchor = true;
-          // dd.set('content', _this.subWidget.domNode); // Prefered ??
-          construct.place(_this.subWidget.domNode, dd.containerNode); // no addChild!
-          _this.connect(_this.subWidget, 'onResize', 'onDropDownResize');
-        }
+      createDropDownTooltip: function() {
+        var dd = new TooltipDialog({
+          class: this.tooltipDialogClass,
+          removeChild: lang.hitch(this, "removeSubWidget")
+        });
+        var _this = this;
+        return this.widgetCreateFunc().then(function(subWidget) {
+          _this.subWidget = subWidget;
+          _this._isJigLoaded = !!_this.subWidget;
+          if (subWidget) {
+            _this.subWidget._floatAnchor = true;
+            // dd.set('content', _this.subWidget.domNode); // Prefered ??
+            construct.place(_this.subWidget.domNode, dd.containerNode); // no addChild!
+            _this.connect(_this.subWidget, "onResize", "onDropDownResize");
+          }
 
-        return dd;
-      });
-    },
+          return dd;
+        });
+      },
 
-    /**
+      /**
      * Create the dropdown widget (async)
      *
      * @return {dojo/Deferred}
      */
-    widgetCreateFunc: function () {
-      var _this = this;
-      var def = new Deferred();
-      value.getModule(this.ddClass).then(function (_Class) {
-        var widget = new _Class(lang.mixin({}, _this.ddOptions));
-        widget._floatAnchor = true;
-        style.set(widget.domNode, _this.ddStyle);
-        if (!widget._started) {
-          widget.startup();
-        }
-        if (!!widget.whenDomReady) {
-          widget.whenDomReady.then(function () {
+      widgetCreateFunc: function() {
+        var _this = this;
+        var def = new Deferred();
+        value.getModule(this.ddClass).then(function(_Class) {
+          var widget = new _Class(lang.mixin({}, _this.ddOptions));
+          widget._floatAnchor = true;
+          style.set(widget.domNode, _this.ddStyle);
+          if (!widget._started) {
+            widget.startup();
+          }
+          if (!!widget.whenDomReady) {
+            widget.whenDomReady.then(function() {
+              def.resolve(widget);
+            });
+          } else {
             def.resolve(widget);
-          });
-        } else {
-          def.resolve(widget);
-        }
+          }
 
-        return widget;
-      });
+          return widget;
+        });
 
-      return def;
-    },
+        return def;
+      },
 
-    removeSubWidget: function () {
-      this.subWidget.domNode.parentNode.removeChild(this.subWidget.domNode);
-      this.closeDropDown();
-      this._isJigLoaded = false;
-    },
-
-    /**
-     * @override
-     */
-    isLoaded: function () {
-      return !!this._isJigLoaded;
-    },
-
-    /**
-     * @override
-     */
-    closeDropDown: function ( /*Boolean*/ focus) {
-
-      if (this.reloadSubWidget) {
-        if (this.subWidget.domNode.parentNode) {
-          this.subWidget.domNode.parentNode.removeChild(this.subWidget.domNode);
-        }
+      removeSubWidget: function() {
+        this.subWidget.domNode.parentNode.removeChild(this.subWidget.domNode);
+        this.closeDropDown();
         this._isJigLoaded = false;
-      }
+      },
 
-      if (this.subWidget && this.subWidget.onHide) {
-        this.subWidget.onHide(this);
-      }
-      if (this._opened) {
-        popup.close(this.dropDown);
-        if (focus) {
-          this.focus();
+      /**
+     * @override
+     */
+      isLoaded: function() {
+        return !!this._isJigLoaded;
+      },
+
+      /**
+     * @override
+     */
+      closeDropDown: function(/*Boolean*/ focus) {
+        if (this.reloadSubWidget) {
+          if (this.subWidget.domNode.parentNode) {
+            this.subWidget.domNode.parentNode.removeChild(
+              this.subWidget.domNode
+            );
+          }
+          this._isJigLoaded = false;
         }
-        this._opened = false;
-        this.state = "";
-      }
-    },
 
-    /**
+        if (this.subWidget && this.subWidget.onHide) {
+          this.subWidget.onHide(this);
+        }
+        if (this._opened) {
+          popup.close(this.dropDown);
+          if (focus) {
+            this.focus();
+          }
+          this._opened = false;
+          this.state = "";
+        }
+      },
+
+      /**
      * Event: triggered from dropdown's 'onResize' event
      */
-    onDropDownResize: function () {
-      if (this._opened) {
-        this.closeDropDown();
-        this.openDropDown();
-      }
-    },
+      onDropDownResize: function() {
+        if (this._opened) {
+          this.closeDropDown();
+          this.openDropDown();
+        }
+      },
 
-    /**
+      /**
      * Helper for setting an attr on the (maybe future) dropdown
      *
      * If the dropdown is loaded, the attr is set immediately, otherwise
      * it is stored for later settings upong loading
      */
-    subAttr: function (name, value) {
-      if (this.subWidget) {
-        this.subWidget.attr(name, value);
-      } else {
-        this.ddOptions[name] = value;
-      }
-    },
+      subAttr: function(name, value) {
+        if (this.subWidget) {
+          this.subWidget.attr(name, value);
+        } else {
+          this.ddOptions[name] = value;
+        }
+      },
 
-    refresh: function () {
-      console.log("Refreshing", this);
-      this.removeSubWidget();
-    },
+      refresh: function() {
+        console.log("Refreshing", this);
+        this.removeSubWidget();
+      },
 
-    declaredClass: module.id
-
-  });
-
-});
+      declaredClass: module.id
+    });
+  }
+);

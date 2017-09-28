@@ -1,19 +1,20 @@
 /**
  * Utilities about deferred, promises and asynchronicity in general
  */
-define([
-  "require",
-  "dojo/_base/Deferred",
-  "dojo/_base/lang",
-  "dojo/_base/window",
-  "dojo/_base/kernel",
-  "dojo/promise/all"
-], function(require, Deferred, lang, window, kernel, allPromises) {
+define(
+  [
+    "require",
+    "dojo/_base/Deferred",
+    "dojo/_base/lang",
+    "dojo/_base/window",
+    "dojo/_base/kernel",
+    "dojo/promise/all"
+  ],
+  function(require, Deferred, lang, window, kernel, allPromises) {
+    var self = {
+      //--noindent--
 
-
-var self = { //--noindent--
-
-  /**
+      /**
    * Generate an already-resolved deferred
    *
    * WILL SOON BE OBSOLETE IN FAVOR OF bindArg() with no promise
@@ -23,13 +24,13 @@ var self = { //--noindent--
    *
    * @return {dojo/Deferred}
    */
-  newResolved: function(arg) {
-    var deferred = new Deferred();
-    deferred.resolve(arg);
-    return deferred;
-  },
+      newResolved: function(arg) {
+        var deferred = new Deferred();
+        deferred.resolve(arg);
+        return deferred;
+      },
 
-  /**
+      /**
    * Bind the given arg the the promise and return the new (bound) promise
    *
    * Kind of dojo's lang.hitch().
@@ -39,22 +40,24 @@ var self = { //--noindent--
    * @param {dojo/Deferred} promise
    * @return {dojo/Deferred}
    */
-  bindArg: function(arg, promise) {
-    if (!promise) {
-      promise = new Deferred();
-      promise.resolve(arg);
-      return promise;
-    }
-    return promise.then(function() { return arg; });
-  },
+      bindArg: function(arg, promise) {
+        if (!promise) {
+          promise = new Deferred();
+          promise.resolve(arg);
+          return promise;
+        }
+        return promise.then(function() {
+          return arg;
+        });
+      },
 
-  newRejected: function(error) {
-    var promise = new Deferred();
-    promise.reject(error);
-    return promise;
-  },
+      newRejected: function(error) {
+        var promise = new Deferred();
+        promise.reject(error);
+        return promise;
+      },
 
-  /**
+      /**
    * Multiplex multiple deferreds
    *
    * TODO: use directly dojo/promise/all
@@ -62,24 +65,28 @@ var self = { //--noindent--
    * @deprecated use dojo's dojo/promise/all instead
    * @return {dojo/Deferred}
    */
-  whenAll: function(deferreds) {
-    kernel.deprecated("geonef/jig/util/async.whenAll()",
-                      "use dojo/promise/all instead");
+      whenAll: function(deferreds) {
+        kernel.deprecated(
+          "geonef/jig/util/async.whenAll()",
+          "use dojo/promise/all instead"
+        );
 
-    return allPromises(deferreds);
-  },
+        return allPromises(deferreds);
+      },
 
-  /**
+      /**
    * @param {Number} delay in milliseconds (arg 2 to dojo/global/setTimeout)
    */
-  whenTimeout: function(delay) {
-    var def = new Deferred();
-    window.global.setTimeout(function() { def.resolve(); }, delay);
+      whenTimeout: function(delay) {
+        var def = new Deferred();
+        window.global.setTimeout(function() {
+          def.resolve();
+        }, delay);
 
-    return def;
-  },
+        return def;
+      },
 
-  /**
+      /**
    * Test given func until it returns true
    *
    * This can be useful to wait for the DOM to be updated, for example.
@@ -89,29 +96,33 @@ var self = { //--noindent--
    * @param {integer} timeout   time before giving up (milliseconds)
    * @return {dojo/Deferred}
    */
-  whenSatisfied: function(testFunc, delay, timeout) {
-    var promise = new Deferred();
-    timeout = timeout || 2000;
-    delay = delay || 50;
-    var count = timeout / delay;
-    var checkFunc = function() {
-      if (testFunc()) {
-        promise.resolve();
-      } else {
-        --count;
-          if (count > 0) {
-            window.global.setTimeout(checkFunc, delay || 50);
+      whenSatisfied: function(testFunc, delay, timeout) {
+        var promise = new Deferred();
+        timeout = timeout || 2000;
+        delay = delay || 50;
+        var count = timeout / delay;
+        var checkFunc = function() {
+          if (testFunc()) {
+            promise.resolve();
           } else {
-            console.warn("whenSatisfied: timeout has passed: ", timeout, "Giving up.");
+            --count;
+            if (count > 0) {
+              window.global.setTimeout(checkFunc, delay || 50);
+            } else {
+              console.warn(
+                "whenSatisfied: timeout has passed: ",
+                timeout,
+                "Giving up."
+              );
+            }
           }
-      }
-    };
-    checkFunc();
+        };
+        checkFunc();
 
-    return promise;
-  },
+        return promise;
+      },
 
-  /**
+      /**
    * Create busy effect on node until returned function is called
    *
    * Example:
@@ -120,68 +131,67 @@ var self = { //--noindent--
    * @param {DOMElement} node
    * @return {function} must be called to stop the busy effect
    */
-  busy: function(node, spinnerSize) {
-    var control;
-    require(["../tool/Processing"], function(Processing) {
-      if (control !== null) { // if terminate callback was called before we are
-        var processingParams = { processingNode: node };
-        if (spinnerSize !== undefined) {
-          processingParams.spinnerSize = spinnerSize;
-        }
-        control = new Processing(processingParams);
-        control.startup();
-      }
-    });
-    return function(arg) {
-      if (control) {
-        control.end();
-      } else {
-        control = null;
-      }
-      return arg;
-    };
-  },
+      busy: function(node, spinnerSize) {
+        var control;
+        require(["../tool/Processing"], function(Processing) {
+          if (control !== null) {
+            // if terminate callback was called before we are
+            var processingParams = { processingNode: node };
+            if (spinnerSize !== undefined) {
+              processingParams.spinnerSize = spinnerSize;
+            }
+            control = new Processing(processingParams);
+            control.startup();
+          }
+        });
+        return function(arg) {
+          if (control) {
+            control.end();
+          } else {
+            control = null;
+          }
+          return arg;
+        };
+      },
 
-  /**
+      /**
    * Return a function which will set its arg to the given obj
    *
    * @param {Object} obj
    * @param {string} name
    * @return {Function}
    */
-  setProp: function(obj, propName) {
-    return function(arg) {
-      obj[propName] = arg;
-      return arg;
-    };
-  },
+      setProp: function(obj, propName) {
+        return function(arg) {
+          obj[propName] = arg;
+          return arg;
+        };
+      },
 
-  /**
+      /**
    * Wrap call into timeout function
    */
-  deferHitch: function(scope, func) {
-    var _func = lang.hitch.apply(null, arguments);
-    return function() {
-      self.whenTimeout(0).then(_func);
-    };
-  },
+      deferHitch: function(scope, func) {
+        var _func = lang.hitch.apply(null, arguments);
+        return function() {
+          self.whenTimeout(0).then(_func);
+        };
+      },
 
-  /**
+      /**
    * Return a function that will return a promise resolved when
    * the given promise is resolved.
    *
    * The promise will be resolved with the argument provided
    * to the function.
    */
-  deferWhen: function(promise) {
-    return function(arg) {
-      return self.bindArg(arg, promise);
+      deferWhen: function(promise) {
+        return function(arg) {
+          return self.bindArg(arg, promise);
+        };
+      }
     };
+
+    return self;
   }
-
-
-};
-
-  return self;
-
-});
+);

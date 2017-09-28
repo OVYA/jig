@@ -2,43 +2,43 @@
  * Example of dumb test module
  *
  */
-define([
-  "module",
-  "dojo/_base/declare",
-  "../TestModule",
-  "../Asserts",
-  "dojo/_base/lang"
-], function(module, declare, TestModule, Asserts, lang) {
+define(
+  [
+    "module",
+    "dojo/_base/declare",
+    "../TestModule",
+    "../Asserts",
+    "dojo/_base/lang"
+  ],
+  function(module, declare, TestModule, Asserts, lang) {
+    return declare(TestModule, {
+      //--noindent--
 
-return declare(TestModule, { //--noindent--
-
-  /**
+      /**
    * Test property
    */
-  prop1: null,
+      prop1: null,
 
-  /**
+      /**
    * @override
    */
-  postMixInProperties: function() {
-    this.inherited(arguments);
-    this.assert = new Asserts(this.test);
-  },
+      postMixInProperties: function() {
+        this.inherited(arguments);
+        this.assert = new Asserts(this.test);
+      },
 
-  /**
+      /**
    * @override
    */
-  execute: function() {
-    this.assert.isTrue(true, "dumb assert (in execute)");
-    this.assert.strictEqual(43, this.prop1, "this.prop1 === 43");
-  },
+      execute: function() {
+        this.assert.isTrue(true, "dumb assert (in execute)");
+        this.assert.strictEqual(43, this.prop1, "this.prop1 === 43");
+      },
 
-  /**
+      /**
    * @override
    */
-  declaredClass: module.id
-
-});
-
-});
-
+      declaredClass: module.id
+    });
+  }
+);

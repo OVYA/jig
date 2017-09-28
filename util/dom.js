@@ -3,14 +3,12 @@
  *
  * The output if these functions is meant to be processed through geonef/jig/util/makeDOM
  */
-define([
-  "module",
-  "dojo/_base/declare",
-  "dojo/_base/lang"
-], function(module, declare, lang) {
-
+define(["module", "dojo/_base/declare", "dojo/_base/lang"], function(
+  module,
+  declare,
+  lang
+) {
   var self = {
-
     /**
      * Build a <table>-based list
      *
@@ -31,24 +29,27 @@ define([
      * @param {Array.<Array>} rows     array of rows
      */
     tableList: function(attrs, rows) {
-      return ["table", {"class": "list"}, [
-        ["tbody", attrs && attrs._tbodyAttrs,
-         rows.map(function(row) {
-           return ["tr", {}, row[1] ?
-                   [
-                     ["td", {"class": "n"}, row[0]],
-                     ["td", {}, row[1]]
-                   ] :
-                   [["td", {colspan: "2"}, row[0]]]
-                  ];
-         })
-        ]]];
+      return [
+        "table",
+        { class: "list" },
+        [
+          [
+            "tbody",
+            attrs && attrs._tbodyAttrs,
+            rows.map(function(row) {
+              return [
+                "tr",
+                {},
+                row[1]
+                  ? [["td", { class: "n" }, row[0]], ["td", {}, row[1]]]
+                  : [["td", { colspan: "2" }, row[0]]]
+              ];
+            })
+          ]
+        ]
+      ];
     }
-
-
   };
 
   return self;
-
 });
-

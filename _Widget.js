@@ -174,6 +174,9 @@ define(
         if (this.domWidgets) {
           this.domWidgets /*.slice(0)*/
             .forEach(function(w) {
+              if (w._destroyed) {
+                return;
+              }
               w.destroy();
             });
           this.domWidgets = [];
@@ -218,9 +221,7 @@ define(
         return allPromises(this.dom(this.makeContentNodes(arg))).then(
           lang.hitch(this, function(nodes) {
             if (this._destroyed) {
-              throw new Error(
-                "rebuildDom(): widget was destroyed in the middle :("
-              );
+              throw new Error("rebuildDom(): widget was destroyed in the middle :(");
             }
 
             nodes.forEach(function(node) {

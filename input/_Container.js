@@ -21,42 +21,42 @@ define(
       //--noindent--
 
       /**
-     * Name of this item: required if we are a child of another _Container
-     */
+       * Name of this item: required if we are a child of another _Container
+       */
       name: "",
 
       /**
-     * If true, will return an array (in doc order) rather than a name/value object
-     *
-     * @type {boolean}
-     */
+       * If true, will return an array (in doc order) rather than a name/value object
+       *
+       * @type {boolean}
+       */
       arrayContainer: false,
 
       /**
-     * If true, returned value is the array of sub-widgets' names whose value is true
-     * Implies that arrayContainer==true
-     *
-     * @type {boolean}
-     */
+       * If true, returned value is the array of sub-widgets' names whose value is true
+       * Implies that arrayContainer==true
+       *
+       * @type {boolean}
+       */
       booleanUnion: false,
 
       /**
-     * All keps specified there are managed by this.attr instead of sub-widgets
-     *
-     * @type {Array.<string>}
-     */
+       * All keps specified there are managed by this.attr instead of sub-widgets
+       *
+       * @type {Array.<string>}
+       */
       manageValueKeys: [],
 
       additionalRoots: [],
 
       /**
-     * 'read-only' property, forwarded to child inputs
-     */
+       * 'read-only' property, forwarded to child inputs
+       */
       readOnly: null,
 
       /**
-     * @override
-     */
+       * @override
+       */
       postMixInProperties: function() {
         this.internalValues = {};
         this.manageValueKeys = lang.clone(this.manageValueKeys);
@@ -64,8 +64,8 @@ define(
       },
 
       /**
-     * @override
-     */
+       * @override
+       */
       buildRendering: function() {
         this.inherited(arguments);
         if (!this.containerNode) {
@@ -74,13 +74,13 @@ define(
       },
 
       /**
-     * Find first descendants widgets having a "name" property
-     *
-     * When a widget is met, if it has a "name" property, the search does not go deeper.
-     * If it does not, its sub-widgets are scanned recursively.
-     *
-     * @return {Array.<dijit/_WidgetBase>}
-     */
+       * Find first descendants widgets having a "name" property
+       *
+       * When a widget is met, if it has a "name" property, the search does not go deeper.
+       * If it does not, its sub-widgets are scanned recursively.
+       *
+       * @return {Array.<dijit/_WidgetBase>}
+       */
       getDescendants: function() {
         var list = [];
         this.getInputRootNodes()
@@ -90,6 +90,7 @@ define(
               list.push(n);
             });
           });
+
         return list;
       },
 
@@ -98,29 +99,27 @@ define(
       },
 
       /**
-     * Make the list of DOMNodes to search child inputs into - protected
-     *
-     * @return {Array.<HTMLElement>}
-     */
+       * Make the list of DOMNodes to search child inputs into - protected
+       *
+       * @return {Array.<HTMLElement>}
+       */
       getInputRootNodes: function() {
         return [this.domNode].concat(this.additionalRoots);
       },
 
       /**
-     * @override
-     */
+       * @override
+       */
       connectChildren: function() {
-        // console.log('connectChildren', this, arguments);
         this.inherited(arguments);
         this.updateChildren();
       },
 
       /**
-     * need to call this to rescan children and update the "onChange" connections :
-     * remove the old ones * and add the new ones
-     */
+       * need to call this to rescan children and update the "onChange" connections :
+       * remove the old ones * and add the new ones
+       */
       updateChildren: function() {
-        // console.log('updateChildren', this, arguments);
         var self = this;
         var _oldChildrenCnts = this._childrenCnts || {};
         this._childrenCnts = {};
@@ -149,65 +148,60 @@ define(
       },
 
       /**
-     * hook - called upon value change (at any sub-input's value change)
-     */
+       * hook - called upon value change (at any sub-input's value change)
+       */
       onChange: function() {},
 
       /**
-     * Focus on first sub-input
-     */
+       * Focus on first sub-input
+       */
       focus: function() {
         var widgets = this.getDescendants();
         return !!widgets[0] && !!widgets[0].focus ? widgets[0].focus() : null;
       },
 
       /**
-     * Get child input by name
-     *
-     * @param {string} name
-     * @return {dijit/_Widget}
-     */
+       * Get child input by name
+       *
+       * @param {string} name
+       * @return {dijit/_Widget}
+       */
       getSubWidget: function(name) {
         var child = this.getDescendants().filter(function(ch) {
           return ch.name === name;
         })[0];
         if (!child) {
-          console.warn(
-            "getSubWidget: child not defined: ",
-            name,
-            this.getDescendants(),
-            this
-          );
+          console.warn("getSubWidget: child not defined: ", name, this.getDescendants(), this);
           return null;
         }
         return child;
       },
 
       /**
-     * Set value of sub-input
-     *
-     * @deprecated Use instead: getSubWidget(name).set("value", value)
-     * @param {string} name
-     * @param {mixed} value
-     */
+       * Set value of sub-input
+       *
+       * @deprecated Use instead: getSubWidget(name).set("value", value)
+       * @param {string} name
+       * @param {mixed} value
+       */
       setSubValue: function(name, value) {
         this.getSubWidget(name).set("value", value);
       },
 
       /**
-     * Get value of sub-input
-     *
-     * @deprecated Use instead: getSubWidget(name).get("value")
-     * @param {string} name
-     * @return {mixed}
-     */
+       * Get value of sub-input
+       *
+       * @deprecated Use instead: getSubWidget(name).get("value")
+       * @param {string} name
+       * @return {mixed}
+       */
       getSubValue: function(name) {
         return this.getSubWidget(name).get("value");
       },
 
       /**
-     * @override
-     */
+       * @override
+       */
       _setValueAttr: function(value, priorityChange) {
         if (!value) {
           this.internalValues = {};
@@ -218,6 +212,7 @@ define(
           //this.inherited(arguments);
           var descendants = this.getDescendants();
           var i;
+
           if (this.booleanUnion) {
             descendants.forEach(function(w) {
               w.set("value", value.indexOf(w.get("name")) !== -1);
@@ -231,30 +226,33 @@ define(
             descendants.forEach(function(w) {
               map[w.name] = w;
             });
-            for (i in value) {
-              if (!value.hasOwnProperty(i)) continue;
-              if (map[i]) {
-                map[i].set("value", value[i], !!priorityChange);
-                delete this.internalValues[i];
-              } else if (this.manageValueKeys.indexOf(i) !== -1) {
-                this.set(i, value[i]);
-              } else {
-                //console.log('missing widget', i, value[i]);
-                this.internalValues[i] = value[i];
+
+            for (var key in value) {
+              if (value.hasOwnProperty(key)) {
+                if (map[key]) {
+                  map[widget].set("value", value[key], !!priorityChange);
+                  delete this.internalValues[key];
+                } else if (this.manageValueKeys.indexOf(key) !== -1) {
+                  this.set(key, value[key]);
+                } else {
+                  // console.log("missing widget", i, value[i]);
+                  this.internalValues[key] = value[key];
+                }
               }
             }
           }
         }
+
         if (priorityChange || priorityChange === undefined) {
           this.onChange();
         }
       },
 
       /**
-     * @override
-     */
+       * @override
+       */
       _getValueAttr: function() {
-        var descendants = this.getDescendants(); // this.getChildren(); //getDescendants is deprecated
+        var descendants = this.getDescendants();
         var value;
         if (this.booleanUnion) {
           value = descendants
@@ -283,19 +281,19 @@ define(
       },
 
       /**
-     * Hook: called before _getValueAttr() returns.
-     *
-     * The value can be modified here
-     */
+       * Hook: called before _getValueAttr() returns.
+       *
+       * The value can be modified here
+       */
       getValueHook: function(value) {
         // hook
       },
 
       /**
-     * Recursively set child inputs as read-only
-     *
-     * @param {boolean} state
-     */
+       * Recursively set child inputs as read-only
+       *
+       * @param {boolean} state
+       */
       _setReadOnlyAttr: function(state) {
         this.readOnly = state;
         if (state === true || state === false) {
@@ -306,8 +304,8 @@ define(
       },
 
       /**
-     * @override
-     */
+       * @override
+       */
       startup: function() {
         this.inherited(arguments);
         this.connectChildren();

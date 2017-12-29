@@ -230,7 +230,7 @@ define(
             for (var key in value) {
               if (value.hasOwnProperty(key)) {
                 if (map[key]) {
-                  map[widget].set("value", value[key], !!priorityChange);
+                  map[key].set("value", value[key], !!priorityChange);
                   delete this.internalValues[key];
                 } else if (this.manageValueKeys.indexOf(key) !== -1) {
                   this.set(key, value[key]);

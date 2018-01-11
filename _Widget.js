@@ -101,6 +101,7 @@ define(
       postMixInProperties: function() {
         this.domWidgets = [];
         this.whenDomReady = new Deferred();
+        this.own(this.whenDomReady);
         this.inherited(arguments);
       },
 
@@ -142,11 +143,13 @@ define(
      */
       startup: function() {
         this.inherited(arguments);
+
         this.domWidgets.forEach(function(w) {
           if (!w._started) {
             w.startup();
           }
         });
+
         if (!this.delayedContent) {
           this.whenDomReady.resolve();
         }
@@ -157,12 +160,15 @@ define(
      */
       destroyRendering: function() {
         this.destroyDom();
+
         if (this._supportingWidgets) {
           this._supportingWidgets.forEach(function(w) {
             w.destroy();
           });
+
           delete this._supportingWidgets;
         }
+
         this.inherited(arguments);
       },
 
@@ -215,6 +221,7 @@ define(
         if (this._destroyed) {
           return null;
         }
+
         this.destroyDom();
         var domNode = this.domNode;
 
@@ -229,7 +236,9 @@ define(
                 domNode.appendChild(node);
               }
             });
+
             this.afterRebuildDom();
+
             return nodes;
           })
         );
@@ -239,9 +248,10 @@ define(
      * Hook
      */
       afterRebuildDom: function() {
-        if (!(this.whenDomReady.fired >= 0)) {
+        if (!this.whenDomReady.isFulfilled()) {
           this.whenDomReady.resolve();
         }
+
         this.onResize();
       },
 

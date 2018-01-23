@@ -66,10 +66,7 @@ define(
    * @return {dojo/Deferred}
    */
       whenAll: function(deferreds) {
-        kernel.deprecated(
-          "geonef/jig/util/async.whenAll()",
-          "use dojo/promise/all instead"
-        );
+        kernel.deprecated("geonef/jig/util/async.whenAll()", "use dojo/promise/all instead");
 
         return allPromises(deferreds);
       },
@@ -80,7 +77,9 @@ define(
       whenTimeout: function(delay) {
         var def = new Deferred();
         window.global.setTimeout(function() {
-          def.resolve();
+          if (!def.isFulfilled()) {
+            def.resolve();
+          }
         }, delay);
 
         return def;
@@ -109,11 +108,7 @@ define(
             if (count > 0) {
               window.global.setTimeout(checkFunc, delay || 50);
             } else {
-              console.warn(
-                "whenSatisfied: timeout has passed: ",
-                timeout,
-                "Giving up."
-              );
+              console.warn("whenSatisfied: timeout has passed: ", timeout, "Giving up.");
             }
           }
         };
